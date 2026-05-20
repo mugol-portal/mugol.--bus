@@ -15,6 +15,7 @@
     --accent: #38bdf8;
     --green: #22c55e;
     --yellow: #facc15;
+    --purple: #a78bfa;
     --text: #e2e8f0;
     --muted: #64748b;
     --border: rgba(255,255,255,0.06);
@@ -30,7 +31,6 @@
     overflow-x: hidden;
   }
 
-  /* Background grid */
   body::before {
     content: '';
     position: fixed;
@@ -51,7 +51,7 @@
     padding: 0 16px 100px;
   }
 
-  /* Header */
+  /* ── Header ── */
   header {
     display: flex;
     align-items: center;
@@ -61,11 +61,7 @@
     margin-bottom: 24px;
   }
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+  .logo { display: flex; align-items: center; gap: 10px; }
 
   .logo-badge {
     background: var(--iett-red);
@@ -85,6 +81,8 @@
     line-height: 1.4;
   }
 
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+
   .time-display {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 13px;
@@ -92,16 +90,41 @@
     text-align: right;
   }
 
-  .time-display .time-big {
-    font-size: 20px;
-    font-weight: 600;
-    display: block;
-  }
+  .time-display .time-big { font-size: 20px; font-weight: 600; display: block; }
 
-  /* Search */
-  .search-section {
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
     margin-bottom: 20px;
   }
+
+  .tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-radius: 7px;
+    padding: 8px 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .tab-btn.active {
+    background: var(--iett-red);
+    color: white;
+    box-shadow: 0 0 10px rgba(232,32,42,0.3);
+  }
+
+  /* ── Search ── */
+  .search-section { margin-bottom: 20px; }
 
   .search-label {
     font-size: 11px;
@@ -112,10 +135,7 @@
     font-family: 'IBM Plex Mono', monospace;
   }
 
-  .search-row {
-    display: flex;
-    gap: 8px;
-  }
+  .search-row { display: flex; gap: 8px; }
 
   .search-input {
     flex: 1;
@@ -133,16 +153,8 @@
     transition: border-color 0.2s, box-shadow 0.2s;
   }
 
-  .search-input::placeholder {
-    color: var(--muted);
-    font-size: 13px;
-    letter-spacing: 1px;
-  }
-
-  .search-input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(56,189,248,0.1);
-  }
+  .search-input::placeholder { color: var(--muted); font-size: 13px; letter-spacing: 1px; }
+  .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(56,189,248,0.1); }
 
   .search-btn {
     background: var(--iett-red);
@@ -159,20 +171,10 @@
     white-space: nowrap;
   }
 
-  .search-btn:hover {
-    background: #c0171f;
-    box-shadow: 0 0 25px rgba(232,32,42,0.5);
-  }
-
+  .search-btn:hover { background: #c0171f; box-shadow: 0 0 25px rgba(232,32,42,0.5); }
   .search-btn:active { transform: scale(0.97); }
 
-  /* Quick lines */
-  .quick-lines {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-  }
+  .quick-lines { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 
   .line-chip {
     background: var(--surface2);
@@ -187,11 +189,7 @@
     transition: all 0.2s;
   }
 
-  .line-chip:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: rgba(56,189,248,0.05);
-  }
+  .line-chip:hover { border-color: var(--accent); color: var(--accent); background: rgba(56,189,248,0.05); }
 
   .recent-chip {
     border-color: rgba(250,204,21,0.2);
@@ -199,16 +197,18 @@
     background: rgba(250,204,21,0.04);
   }
 
-  .recent-chip:hover {
-    border-color: var(--yellow);
-    background: rgba(250,204,21,0.08);
-    color: var(--yellow);
+  .recent-chip:hover { border-color: var(--yellow); background: rgba(250,204,21,0.08); color: var(--yellow); }
+
+  .fav-chip {
+    border-color: rgba(232,32,42,0.25);
+    color: var(--iett-red);
+    background: rgba(232,32,42,0.05);
   }
 
-  /* Stop selector */
-  .stop-section {
-    margin-bottom: 20px;
-  }
+  .fav-chip:hover { border-color: var(--iett-red); background: rgba(232,32,42,0.1); }
+
+  /* ── Stop selector ── */
+  .stop-section { margin-bottom: 20px; }
 
   .stop-select {
     width: 100%;
@@ -231,7 +231,7 @@
   .stop-select:focus { border-color: var(--accent); }
   .stop-select option { background: var(--surface); }
 
-  /* Status bar */
+  /* ── Status bar ── */
   .status-bar {
     display: flex;
     align-items: center;
@@ -260,7 +260,7 @@
     50% { opacity: 0.5; transform: scale(0.8); }
   }
 
-  /* Section title */
+  /* ── Section title ── */
   .section-title {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
@@ -280,13 +280,8 @@
     background: var(--border);
   }
 
-  /* Bus cards */
-  .buses-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 28px;
-  }
+  /* ── Bus cards ── */
+  .buses-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
 
   .bus-card {
     background: var(--surface);
@@ -305,14 +300,9 @@
     cursor: pointer;
   }
 
-  .bus-card:hover {
-    border-color: rgba(56,189,248,0.2);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  }
+  .bus-card:hover { border-color: rgba(56,189,248,0.2); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
 
-  @keyframes slideIn {
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
 
   .bus-card:nth-child(1) { animation-delay: 0.05s; }
   .bus-card:nth-child(2) { animation-delay: 0.1s; }
@@ -324,35 +314,18 @@
     background: linear-gradient(135deg, rgba(34,197,94,0.05), var(--surface));
   }
 
-  .bus-card.arriving::before {
+  .bus-card::before {
     content: '';
     position: absolute;
     top: 0; left: 0;
     width: 3px;
     height: 100%;
-    background: var(--green);
     border-radius: 12px 0 0 12px;
   }
 
-  .bus-card.soon::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 3px;
-    height: 100%;
-    background: var(--yellow);
-    border-radius: 12px 0 0 12px;
-  }
-
-  .bus-card.later::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 3px;
-    height: 100%;
-    background: var(--muted);
-    border-radius: 12px 0 0 12px;
-  }
+  .bus-card.arriving::before { background: var(--green); }
+  .bus-card.soon::before { background: var(--yellow); }
+  .bus-card.later::before { background: var(--muted); }
 
   .bus-line-badge {
     background: var(--iett-red);
@@ -367,10 +340,7 @@
     flex-shrink: 0;
   }
 
-  .bus-info {
-    flex: 1;
-    min-width: 0;
-  }
+  .bus-info { flex: 1; min-width: 0; }
 
   .bus-destination {
     font-size: 14px;
@@ -389,6 +359,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
   }
 
   .bus-details .plate {
@@ -398,10 +369,7 @@
     font-size: 10px;
   }
 
-  .arrival-block {
-    text-align: right;
-    flex-shrink: 0;
-  }
+  .arrival-block { text-align: right; flex-shrink: 0; }
 
   .arrival-min {
     font-family: 'Bebas Neue', sans-serif;
@@ -428,27 +396,13 @@
     margin-top: 2px;
   }
 
-  /* Occupancy */
-  .occupancy {
-    display: flex;
-    gap: 2px;
-    margin-top: 4px;
-  }
-
-  .occ-bar {
-    width: 6px;
-    height: 12px;
-    border-radius: 2px;
-    background: var(--surface2);
-  }
-
+  .occupancy { display: flex; gap: 2px; margin-top: 4px; }
+  .occ-bar { width: 6px; height: 12px; border-radius: 2px; background: var(--surface2); }
   .occ-bar.filled { background: var(--accent); }
   .occ-bar.full { background: var(--iett-red); }
 
-  /* Map section */
-  .map-section {
-    margin-bottom: 24px;
-  }
+  /* ── Route map ── */
+  .map-section { margin-bottom: 24px; }
 
   .bus-route-map {
     background: var(--surface);
@@ -468,8 +422,7 @@
 
   .route-track {
     position: absolute;
-    top: 50%;
-    left: 0; right: 0;
+    top: 50%; left: 0; right: 0;
     height: 3px;
     background: var(--surface2);
     transform: translateY(-50%);
@@ -478,8 +431,7 @@
 
   .route-progress {
     position: absolute;
-    top: 50%;
-    left: 0;
+    top: 50%; left: 0;
     height: 3px;
     background: linear-gradient(90deg, var(--iett-red), var(--iett-orange));
     transform: translateY(-50%);
@@ -492,8 +444,7 @@
     position: absolute;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 10px;
-    height: 10px;
+    width: 10px; height: 10px;
     border-radius: 50%;
     background: var(--muted);
     border: 2px solid var(--surface);
@@ -501,20 +452,11 @@
   }
 
   .stop-dot.passed { background: var(--iett-red); }
-  .stop-dot.current {
-    background: var(--surface);
-    border-color: var(--accent);
-    box-shadow: 0 0 10px var(--accent);
-    width: 14px;
-    height: 14px;
-  }
-
   .stop-dot.you {
     background: var(--green);
     border-color: var(--surface);
     box-shadow: 0 0 10px var(--green);
-    width: 14px;
-    height: 14px;
+    width: 14px; height: 14px;
   }
 
   .stop-label {
@@ -550,22 +492,10 @@
     flex-wrap: wrap;
   }
 
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: var(--muted);
-    font-family: 'IBM Plex Mono', monospace;
-  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-  .legend-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-  }
-
-  /* Stats row */
+  /* ── Stats row ── */
   .stats-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -597,7 +527,7 @@
     letter-spacing: 1px;
   }
 
-  /* Refresh btn */
+  /* ── Refresh btn ── */
   .refresh-btn {
     display: flex;
     align-items: center;
@@ -616,16 +546,11 @@
     margin-bottom: 20px;
   }
 
-  .refresh-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: rgba(56,189,248,0.04);
-  }
-
+  .refresh-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(56,189,248,0.04); }
   .refresh-icon { transition: transform 0.6s ease; }
   .refresh-btn:hover .refresh-icon { transform: rotate(360deg); }
 
-  /* Notifications */
+  /* ── Notifications ── */
   .notification {
     position: fixed;
     bottom: 20px;
@@ -643,11 +568,13 @@
     transition: transform 0.3s ease;
     white-space: nowrap;
     max-width: calc(100vw - 32px);
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .notification.show { transform: translateX(-50%) translateY(0); }
 
-  /* Loading skeleton */
+  /* ── Skeleton ── */
   .skeleton {
     background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
     background-size: 200% 100%;
@@ -655,26 +582,145 @@
     border-radius: 6px;
   }
 
-  @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-  .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--muted);
-  }
-
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
   .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.6; }
 
-  .empty-state p {
+  /* ── YENİ: Saatlik sefer tablosu ── */
+  .seferler-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px;
-    line-height: 1.6;
   }
 
-  /* Scroll hint */
+  .seferler-table thead th {
+    padding: 8px 12px;
+    text-align: left;
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .seferler-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+    cursor: default;
+  }
+
+  .seferler-table tbody tr:hover { background: var(--surface2); }
+
+  .seferler-table tbody td {
+    padding: 10px 12px;
+    color: var(--text);
+  }
+
+  .seferler-table .saat-cell {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .seferler-table .gecti { opacity: 0.35; text-decoration: line-through; }
+  .seferler-table .simdi { color: var(--green); }
+
+  /* ── YENİ: Modal ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px 40px;
+    width: 100%;
+    max-width: 480px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+
+  .modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 2px;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .modal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .modal-row:last-child { border-bottom: none; }
+  .modal-key { color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+  .modal-val { color: var(--text); font-weight: 600; font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+
+  .modal-close {
+    margin-top: 20px;
+    width: 100%;
+    padding: 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── YENİ: Durak Seferleri paneli ── */
+  #seferlerPanel { display: none; }
+
+  /* ── YENİ: API hata detayı ── */
+  .api-debug {
+    background: rgba(232,32,42,0.05);
+    border: 1px solid rgba(232,32,42,0.15);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── Favori paneli ── */
+  #favPanel { display: none; margin-bottom: 20px; }
+
   .scroll-hint {
     text-align: center;
     padding: 10px;
@@ -684,10 +730,7 @@
     animation: bounce 2s infinite;
   }
 
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(4px); }
-  }
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 </style>
 </head>
 <body>
@@ -699,64 +742,114 @@
       <div class="logo-badge">İETT</div>
       <div class="logo-text">İstanbul<br>Otobüs Takip</div>
     </div>
-    <div class="time-display">
-      <span class="time-big" id="clock">--:--</span>
-      <span id="date-display" style="font-size:10px; color: var(--muted)">Yükleniyor...</span>
+    <div class="header-right">
+      <div class="time-display">
+        <span class="time-big" id="clock">--:--</span>
+        <span id="date-display" style="font-size:10px;color:var(--muted)">Yükleniyor...</span>
+      </div>
     </div>
   </header>
 
-  <!-- Search -->
-  <div class="search-section">
-    <div class="search-label">Hat Numarası</div>
-    <div class="search-row">
-      <input class="search-input" id="lineInput" type="text" placeholder="örn. 34T, 500T..." maxlength="6"
-        onkeydown="if(event.key==='Enter') searchLine()">
-      <button class="search-btn" onclick="searchLine()">ARA</button>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('ara')">🔍 Hat Ara</button>
+    <button class="tab-btn" onclick="switchTab('favoriler')">⭐ Favoriler</button>
+    <button class="tab-btn" onclick="switchTab('seferler')">📋 Sefer Saatleri</button>
+  </div>
+
+  <!-- Tab: Ara -->
+  <div id="tabAra">
+    <div class="search-section">
+      <div class="search-label">Hat Numarası</div>
+      <div class="search-row">
+        <input class="search-input" id="lineInput" type="text" placeholder="örn. 34T, 500T..." maxlength="6"
+          onkeydown="if(event.key==='Enter') searchLine()">
+        <button class="search-btn" onclick="searchLine()">ARA</button>
+      </div>
+      <div class="quick-lines" id="quickLines">
+        <div class="line-chip" onclick="selectLine('34T')">34T</div>
+        <div class="line-chip" onclick="selectLine('15B')">15B</div>
+        <div class="line-chip" onclick="selectLine('500T')">500T</div>
+        <div class="line-chip" onclick="selectLine('28')">28</div>
+        <div class="line-chip" onclick="selectLine('17B')">17B</div>
+        <div class="line-chip" onclick="selectLine('43R')">43R</div>
+      </div>
     </div>
-    <div class="quick-lines">
-      <div class="line-chip" onclick="selectLine('34T')">34T</div>
-      <div class="line-chip" onclick="selectLine('15B')">15B</div>
-      <div class="line-chip" onclick="selectLine('500T')">500T</div>
-      <div class="line-chip" onclick="selectLine('28')">28</div>
-      <div class="line-chip" onclick="selectLine('17B')">17B</div>
-      <div class="line-chip" onclick="selectLine('43R')">43R</div>
+
+    <!-- Son Aramalar -->
+    <div id="recentContainer" style="display:none;margin-bottom:14px">
+      <div class="search-label">Son Aramalar</div>
+      <div class="quick-lines recents-list"></div>
+    </div>
+
+    <!-- Durak seç -->
+    <div class="stop-section" id="stopSection" style="display:none">
+      <div class="search-label" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Durak Seç</span>
+        <span id="stopCount" style="font-size:10px;color:var(--muted)"></span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select class="stop-select" id="stopSelect" onchange="loadBuses()" style="flex:1"></select>
+        <button id="favBtn" onclick="toggleFavorite()" title="Favorilere ekle"
+          style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:18px;cursor:pointer;color:var(--muted);transition:all 0.2s;flex-shrink:0">☆</button>
+      </div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="status-bar" id="statusBar" style="display:none">
+      <div class="status-dot"></div>
+      <span id="statusText" style="flex:1">Canlı veri alınıyor...</span>
+      <span id="simBadge" style="display:none;font-size:9px;background:rgba(250,204,21,0.15);border:1px solid rgba(250,204,21,0.3);border-radius:4px;padding:2px 6px;letter-spacing:1px">SİMÜLE</span>
+      <span id="countdownEl" style="font-size:10px;opacity:0.6;margin-left:6px"></span>
+    </div>
+
+    <!-- Main content -->
+    <div id="mainContent">
+      <div class="empty-state">
+        <div class="empty-icon">🚌</div>
+        <p>Hat numarası girin<br>Gerçek İETT verisi yüklenecek</p>
+        <p style="margin-top:8px;font-size:10px;color:var(--muted)">Örn: 34T · 15B · 500T · 28 · 43R</p>
+      </div>
     </div>
   </div>
 
-  <!-- Son Aramalar -->
-  <div id="recentContainer" style="display:none;margin-bottom:14px">
-    <div class="search-label">Son Aramalar</div>
-    <div class="quick-lines recents-list"></div>
-  </div>
-
-  <!-- Stop selector -->
-  <div class="stop-section" id="stopSection" style="display:none">
-    <div class="search-label" style="display:flex;justify-content:space-between;align-items:center">
-      <span>Durak Seç</span>
-      <span id="stopCount" style="font-size:10px;color:var(--muted)"></span>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <select class="stop-select" id="stopSelect" onchange="loadBuses()" style="flex:1"></select>
-      <button id="favBtn" onclick="toggleFavorite()" title="Favorilere ekle"
-        style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:18px;cursor:pointer;color:var(--muted);transition:all 0.2s;flex-shrink:0">☆</button>
+  <!-- Tab: Favoriler -->
+  <div id="tabFavoriler" style="display:none">
+    <div id="favContent">
+      <div class="empty-state">
+        <div class="empty-icon">⭐</div>
+        <p>Henüz favori hat yok</p>
+        <p style="margin-top:8px;font-size:10px;color:var(--muted)">Hat arayıp ☆ butonuna basın</p>
+      </div>
     </div>
   </div>
 
-  <!-- Status bar -->
-  <div class="status-bar" id="statusBar" style="display:none">
-    <div class="status-dot"></div>
-    <span id="statusText" style="flex:1">Canlı veri alınıyor...</span>
-    <span id="simBadge" style="display:none;font-size:9px;background:rgba(250,204,21,0.15);border:1px solid rgba(250,204,21,0.3);border-radius:4px;padding:2px 6px;letter-spacing:1px">SİMÜLE</span>
-    <span id="countdownEl" style="font-size:10px;opacity:0.6;margin-left:6px"></span>
-  </div>
-
-  <!-- Main content -->
-  <div id="mainContent">
-    <div class="empty-state">
-      <div class="empty-icon">🚌</div>
-      <p>Hat numarası girin<br>Gerçek İETT verisi yüklenecek</p>
-      <p style="margin-top:8px;font-size:10px;color:var(--muted)">Örn: 34T · 15B · 500T · 28 · 43R</p>
+  <!-- Tab: Sefer Saatleri -->
+  <div id="tabSeferler" style="display:none">
+    <div class="search-section">
+      <div class="search-label">Hat Numarası</div>
+      <div class="search-row">
+        <input class="search-input" id="seferLineInput" type="text" placeholder="örn. 34T..." maxlength="6"
+          onkeydown="if(event.key==='Enter') loadSeferler()">
+        <button class="search-btn" onclick="loadSeferler()">GETIR</button>
+      </div>
     </div>
+    <div id="seferlerContent">
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <p>Hat numarası girerek<br>sefer saatlerini görün</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bus detail modal -->
+<div class="modal-overlay" id="busModal" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">Otobüs Detayı</div>
+    <div id="modalBody"></div>
+    <button class="modal-close" onclick="closeModal()">Kapat</button>
   </div>
 </div>
 
@@ -764,38 +857,30 @@
 <div class="notification" id="notification"></div>
 
 <script>
-// ══════════════════════════════════════════════════════
-//  İETT OTOBÜS TAKİP
-//  Strateji: Gerçek IBB API (CORS proxy) → Claude AI Simülasyon
-//  Gerçek API başarısız olunca Claude AI gerçekçi veri üretir
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+//  İETT OTOBÜS TAKİP v2
+//  Cloudflare Worker proxy → IBB API → Simülasyon fallback
+// ══════════════════════════════════════════════════════════
 
 const IETT_BASE = "https://api.ibb.gov.tr/iett";
+const CF_WORKER = "https://iett-proxy.mugol-education-help.workers.dev";
 
-// CORS proxy sırası - güncel servisler
-const CORS_PROXIES = [
-  url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
-  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  url => `https://thingproxy.freeboard.io/fetch/${url}`,
-  url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-  url => `https://cors-anywhere.herokuapp.com/${url}`,
-];
-
-// ── State ───────────────────────────────────────────────────────────────────
-let currentLine = null;
+// ── State ──────────────────────────────────────────────────
+let currentLine   = null;
 let currentLineData = null;
 let currentStopCode = null;
-let currentStopIdx = 0;
+let currentStopIdx  = 0;
 let buses = [];
-let refreshInterval = null;
-let animInterval = null;
-let refreshCountdown = 30;
+let refreshInterval  = null;
+let animInterval     = null;
 let countdownInterval = null;
-let recentSearches = [];
-let favorites = [];
+let refreshCountdown = 30;
+let recentSearches = JSON.parse(localStorage.getItem('iett_recents') || '[]');
+let favorites      = JSON.parse(localStorage.getItem('iett_favs')    || '[]');
 let isSimulated = false;
+let activeTab = 'ara';
 
-// ── Clock ───────────────────────────────────────────────────────────────────
+// ── Clock ──────────────────────────────────────────────────
 function updateClock() {
   const now = new Date();
   document.getElementById('clock').textContent =
@@ -807,173 +892,353 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// ── IBB REST API: CORS Proxy ─────────────────────────────────────────────────
-async function iettFetch(path) {
-  const targetUrl = IETT_BASE + path;
+// ── Tab navigation ─────────────────────────────────────────
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['ara','favoriler','seferler'][i] === tab);
+  });
+  document.getElementById('tabAra').style.display        = tab === 'ara'        ? '' : 'none';
+  document.getElementById('tabFavoriler').style.display  = tab === 'favoriler'  ? '' : 'none';
+  document.getElementById('tabSeferler').style.display   = tab === 'seferler'   ? '' : 'none';
+  if (tab === 'favoriler') renderFavPanel();
+}
 
-  // Önce direkt (bazı tarayıcılar/ortamlar çalışabilir)
+// ── Storage helpers ────────────────────────────────────────
+function saveStorage() {
+  localStorage.setItem('iett_recents', JSON.stringify(recentSearches));
+  localStorage.setItem('iett_favs',    JSON.stringify(favorites));
+}
+
+// ── API: Cloudflare Worker proxy ───────────────────────────
+// Worker beklediği format: ?path=/UlasimAnaVeri/...&params=HatKodu=34T
+async function iettFetch(path) {
+  // path örn: /UlasimAnaVeri/HatDurakGuzergah.asmx/GetHat_json?HatKodu=34T
+  const [apiPath, apiParams] = path.split('?');
+  const q = apiParams ? `&params=${encodeURIComponent(apiParams)}` : '';
+  const workerUrl = `${CF_WORKER}?path=${encodeURIComponent(apiPath)}${q}`;
+
+  // 1. Cloudflare Worker
   try {
-    const r = await fetch(targetUrl, { signal: AbortSignal.timeout(4000) });
+    const r = await fetch(workerUrl, { signal: AbortSignal.timeout(8000) });
+    if (r.ok) {
+      const text = await r.text();
+      const parsed = parseIETTJSON(text);
+      if (parsed && !(Array.isArray(parsed) && parsed.length === 0)) return parsed;
+    }
+  } catch(e) {
+    console.warn('[CF Worker]', e.message);
+  }
+
+  // 2. Direkt (bazı ortamlarda CORS açık olabilir)
+  try {
+    const r = await fetch(IETT_BASE + path, { signal: AbortSignal.timeout(5000) });
     if (r.ok) return parseIETTJSON(await r.text());
   } catch {}
 
-  // CORS proxy sırası
-  for (const proxy of CORS_PROXIES) {
-    try {
-      const r = await fetch(proxy(targetUrl), { signal: AbortSignal.timeout(10000) });
-      if (!r.ok) continue;
-      return parseIETTJSON(await r.text());
-    } catch(e) {
-      console.warn('Proxy başarısız:', proxy(targetUrl).slice(0,40), e.message);
-    }
-  }
+  // 3. corsproxy.io yedek
+  try {
+    const r = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(IETT_BASE + path)}`,
+      { signal: AbortSignal.timeout(10000) });
+    if (r.ok) return parseIETTJSON(await r.text());
+  } catch {}
+
   throw new Error('CORS_FAIL');
 }
 
 function parseIETTJSON(text) {
   text = text.trim();
+  // Bazen çift encode edilmiş JSON gelir
   try {
     const p = JSON.parse(text);
-    return typeof p === 'string' ? JSON.parse(p) : p;
+    if (typeof p === 'string') return JSON.parse(p);
+    return p;
   } catch {
-    const u = text.replace(/^"|"$/g,'').replace(/\\"/g,'"').replace(/\\\//g,'/');
-    return JSON.parse(u);
+    // Escaped string olabilir
+    try {
+      const u = text.replace(/^"|"$/g,'').replace(/\\"/g,'"').replace(/\\\//g,'/');
+      return JSON.parse(u);
+    } catch { return null; }
   }
 }
 
-// ── Claude AI Simülasyon Fallback ─────────────────────────────────────────────
-async function claudeSimulate(prompt) {
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true"
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1200,
-      system: `Sen İstanbul İETT otobüs hattı simülatörüsün. 
-Gerçek İstanbul coğrafyasına dayalı gerçekçi simüle veri üret.
-YALNIZCA geçerli JSON döndür. Açıklama, markdown, kod bloğu kullanma.`,
-      messages: [{ role: "user", content: prompt }]
-    })
-  });
-  const d = await r.json();
-  if (d.error) throw new Error(d.error.message || 'Claude API hatası');
-  const txt = d.content?.find(b => b.type==="text")?.text || '{}';
-  return JSON.parse(txt.replace(/```json\n?|```\n?/g,'').trim());
+// ── Gerçek IBB API Endpoint'leri ──────────────────────────
+// IBB API field adları: büyük veya küçük harf gelebilir, her ikisine de bak
+function field(obj, ...keys) {
+  for (const k of keys) {
+    if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') return obj[k];
+    const kl = k.toLowerCase();
+    if (obj[kl] !== undefined && obj[kl] !== null && obj[kl] !== '') return obj[kl];
+    const ku = k.toUpperCase();
+    if (obj[ku] !== undefined && obj[ku] !== null && obj[ku] !== '') return obj[ku];
+  }
+  return null;
 }
 
-async function simulateHatDuraklar(hatKodu) {
-  return claudeSimulate(`"${hatKodu}" İETT hattı için gerçekçi durak listesi üret.
-İstanbul'un gerçek semtlerini kullan (Kadıköy, Üsküdar, Beşiktaş, Taksim, vb.).
-Bu hattın güzergahına uygun 18-28 durak oluştur.
-
-JSON formatı (başka hiçbir şey yazma):
-[
-  {"SDURAKADI":"DURAK ADI","SDURAKKODU":"${hatKodu.replace(/\D/g,'')}001","SIRANO":"1"},
-  {"SDURAKADI":"DURAK ADI","SDURAKKODU":"${hatKodu.replace(/\D/g,'')}002","SIRANO":"2"}
-]`);
-}
-
-async function simulateOtobusler(hatKodu) {
-  const now = new Date();
-  return claudeSimulate(`"${hatKodu}" İETT hattı için ${now.toLocaleTimeString('tr-TR')} saatindeki anlık otobüs verileri.
-2-5 aktif otobüs üret. İstanbul plakası formatı: 34 XX 1234.
-
-JSON formatı (başka hiçbir şey yazma):
-[
-  {"kapino":"34 XX 1234","yon":"İSTİKAMET","yakinDurakAdi":"DURAK ADI","hatkodu":"${hatKodu}"},
-  {"kapino":"34 YY 5678","yon":"İSTİKAMET","yakinDurakAdi":"DURAK ADI","hatkodu":"${hatKodu}"}
-]`);
-}
-
-async function simulateDurakSaatleri(durakKodu, hatKodu) {
-  return claudeSimulate(`"${hatKodu}" hattı, "${durakKodu}" durağı için tahmini varış süreleri.
-3-4 otobüs üret. İlk otobüs 2-6 dk, sonrakiler 8-20 dk aralığında.
-
-JSON formatı (başka hiçbir şey yazma):
-[
-  {"kapino":"34 XX 1234","gelis_dakika":"4","hatkodu":"${hatKodu}","yon":"İSTİKAMET"},
-  {"kapino":"34 YY 5678","gelis_dakika":"11","hatkodu":"${hatKodu}","yon":"İSTİKAMET"}
-]`);
-}
-
-// ── API Fonksiyonları (Gerçek → Simüle fallback) ─────────────────────────────
 async function fetchHatBilgisi(hatKodu) {
   try {
-    // HatDurakGuzergah servisi - GetHat_json
     const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHat_json?HatKodu=${encodeURIComponent(hatKodu)}`);
-    return Array.isArray(d) ? d[0] : (d || null);
+    if (!d) return null;
+    const arr = Array.isArray(d) ? d : [d];
+    return arr[0] || null;
   } catch { return null; }
 }
 
 async function fetchHatDuraklar(hatKodu) {
-  // Deneme sırası: REST JSON → SOAP XML → Claude AI simülasyon
-  const endpoints = [
-    `/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHatDurakList_json?HatKodu=${encodeURIComponent(hatKodu)}`,
-    `/UlasimAnaVeri/HatDurakGuzergah.asmx/GetDurak_json?DurakKodu=`,
-  ];
-  for (const ep of endpoints) {
-    try {
-      const d = await iettFetch(ep.startsWith('/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHatDurakList') ? ep : null);
-      if (d) {
-        if (Array.isArray(d) && d.length > 0) return d;
-      }
-    } catch {}
-  }
   try {
     const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHatDurakList_json?HatKodu=${encodeURIComponent(hatKodu)}`);
-    if (Array.isArray(d) && d.length > 0) return d;
+    if (Array.isArray(d) && d.length > 0) return { data: d, sim: false };
     throw new Error('empty');
   } catch {
-    // Gerçek API başarısız → Claude simülasyon
     isSimulated = true;
-    return simulateHatDuraklar(hatKodu);
+    return { data: await simulateHatDuraklar(hatKodu), sim: true };
   }
 }
 
 async function fetchHatOtobusler(hatKodu) {
-  if (isSimulated) return simulateOtobusler(hatKodu);
+  if (isSimulated) return { data: await simulateOtobusler(hatKodu), sim: true };
   try {
-    // SeferGerceklesme servisi - GetHatOtoKonum_json (onur2677/iett-api: SeferGerceklesme)
     const d = await iettFetch(`/FiloDurum/SeferGerceklesme.asmx/GetHatOtoKonum_json?HatKodu=${encodeURIComponent(hatKodu)}`);
-    return Array.isArray(d) ? d : null;
-  } catch { return simulateOtobusler(hatKodu); }
+    if (Array.isArray(d) && d.length > 0) return { data: d, sim: false };
+    return { data: await simulateOtobusler(hatKodu), sim: true };
+  } catch {
+    return { data: await simulateOtobusler(hatKodu), sim: true };
+  }
 }
 
 async function fetchDurakSaatleri(durakKodu, hatKodu) {
-  if (isSimulated) return simulateDurakSaatleri(durakKodu, hatKodu);
+  if (isSimulated) return { data: await simulateDurakSaatleri(durakKodu, hatKodu), sim: true };
+  // Endpoint 1: Durak bazlı geliş tahmini
   try {
-    // Önce PlanlananSeferSaati servisini dene (onur2677/iett-api: PlanlananSeferSaati)
-    const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetPlanlananSeferSaati_json?HatKodu=${encodeURIComponent(hatKodu)}`);
-    if (Array.isArray(d) && d.length > 0) return d;
+    const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetDurakGuzergahSaati_json?DurakKodu=${encodeURIComponent(durakKodu)}&HatKodu=${encodeURIComponent(hatKodu)}`);
+    if (Array.isArray(d) && d.length > 0) return { data: d, sim: false };
   } catch {}
+  // Endpoint 2: Hat saatleri
   try {
-    // Fallback: DurakHatSaati
+    const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetPlanlananSeferSaati_json?HatKodu=${encodeURIComponent(hatKodu)}`);
+    if (Array.isArray(d) && d.length > 0) return { data: d, sim: false };
+  } catch {}
+  // Endpoint 3: Durak hat saati
+  try {
     const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetDurakHatSaati_json?DurakKodu=${encodeURIComponent(durakKodu)}&HatKodu=${encodeURIComponent(hatKodu)}`);
-    return Array.isArray(d) ? d : [];
-  } catch { return simulateDurakSaatleri(durakKodu, hatKodu); }
+    if (Array.isArray(d) && d.length > 0) return { data: d, sim: false };
+  } catch {}
+  return { data: await simulateDurakSaatleri(durakKodu, hatKodu), sim: true };
 }
 
-// ── UI Helpers ───────────────────────────────────────────────────────────────
+async function fetchSeferSaatleri(hatKodu) {
+  try {
+    const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetPlanlananSeferSaati_json?HatKodu=${encodeURIComponent(hatKodu)}`);
+    if (Array.isArray(d) && d.length > 0) return { data: d, sim: false };
+  } catch {}
+  return { data: simulateSeferSaatleri(hatKodu), sim: true };
+}
+
+// ── Simülasyon ─────────────────────────────────────────────
+const IST_SEMTLER = [
+  'KADIKÖY','ÜSKÜDAR','BEŞİKTAŞ','TAKSİM','BEYOĞLU','EMİNÖNÜ','KARAKÖY',
+  'BAKIRKOY','BAĞCILAR','GAZİOSMANPAŞA','AVCILAR','BAYRAMPAŞA','KAĞITHANE',
+  'SARIYER','MASLAK','LEVENT','MECİDİYEKÖY','ŞİŞLİ','NİŞANTAŞI','OKMEYDANI',
+  'ZEYTİNBURNU','YENİKAPI','TOPKAPI','EDİRNEKAPI','EYÜP','SULTANBEYLİ',
+  'ÜMRANİYE','MALTEPE','KARTAL','PENDİK','TUZLA','BOSTANCI','GÖZTEPE',
+  'KOZYATAĞI','İÇERENKÖY','ATAŞEHİR','DUDULLU','SUADİYE','ÇENGELKÖY'
+];
+const IST_PLAKA_HARF = ['AB','AE','AF','AK','AL','AM','AN','BA','BB','BC','CA','CB','DA','DB','EA','EB','FA','FB','GA','GB'];
+
+function rnd(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function rndFrom(arr) { return arr[rnd(0, arr.length - 1)]; }
+
+function generatePlaka() {
+  return `34 ${rndFrom(IST_PLAKA_HARF)} ${String(rnd(100, 9999)).padStart(4,'0')}`;
+}
+
+function generateDuraklar(hatKodu) {
+  const n = rnd(18, 28);
+  const semtler = [...IST_SEMTLER].sort(() => Math.random() - 0.5).slice(0, Math.ceil(n / 4));
+  const stops = [];
+  const numPrefix = hatKodu.replace(/\D/g,'') || '99';
+  let si = 0;
+  const ekler = ['CADDESİ','SOKAK','MEYDANI','PARKI','KÖPRÜSÜ','DURAĞU',''];
+  for (let i = 0; i < n; i++) {
+    if (i > 0 && i % Math.floor(n / semtler.length) === 0) si = Math.min(si+1, semtler.length-1);
+    const ek = rndFrom(ekler);
+    stops.push({
+      SDURAKADI: ek ? `${semtler[si]} ${ek}` : semtler[si],
+      SDURAKKODU: `${numPrefix}${String(i+1).padStart(3,'0')}`,
+      SIRANO: String(i+1)
+    });
+  }
+  return stops;
+}
+
+function generateOtobusler(hatKodu, duraklar) {
+  const n = duraklar.length;
+  return Array.from({length: rnd(2,5)}, () => {
+    const si = rnd(0, n-2);
+    return {
+      kapino: generatePlaka(),
+      yon: duraklar[n-1].SDURAKADI,
+      yakinDurakAdi: duraklar[si].SDURAKADI,
+      hatkodu: hatKodu,
+      guzergahkodu: hatKodu
+    };
+  });
+}
+
+function generateDurakSaatleri(hatKodu, duraklar) {
+  const n = duraklar.length;
+  const result = [];
+  let dk = rnd(2, 7);
+  for (let i = 0; i < rnd(3,5); i++) {
+    result.push({
+      kapino: generatePlaka(),
+      gelis_dakika: String(dk),
+      GELIS_DAKIKA: String(dk),
+      hatkodu: hatKodu,
+      yon: duraklar[n-1].SDURAKADI,
+      yakinDurakAdi: duraklar[rnd(0, Math.floor(n/2))].SDURAKADI
+    });
+    dk += rnd(5, 13);
+  }
+  return result;
+}
+
+function simulateSeferSaatleri(hatKodu) {
+  // Gerçekçi sefer saatleri simülasyonu
+  const saatler = [];
+  let h = 5, m = rnd(0, 30);
+  while (!(h === 24 && m > 0)) {
+    saatler.push({
+      SEFERSAATI: `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`,
+      HATKODU: hatKodu,
+      yon: 'GİDİŞ'
+    });
+    m += rnd(15, 25);
+    if (m >= 60) { h++; m -= 60; }
+    if (h >= 24) break;
+  }
+  return saatler;
+}
+
+const _simCache = {};
+
+async function simulateHatDuraklar(hatKodu) {
+  if (!_simCache[hatKodu]) _simCache[hatKodu] = {};
+  if (!_simCache[hatKodu].duraklar) _simCache[hatKodu].duraklar = generateDuraklar(hatKodu);
+  return _simCache[hatKodu].duraklar;
+}
+
+async function simulateOtobusler(hatKodu) {
+  const duraklar = _simCache[hatKodu]?.duraklar || generateDuraklar(hatKodu);
+  return generateOtobusler(hatKodu, duraklar);
+}
+
+async function simulateDurakSaatleri(durakKodu, hatKodu) {
+  const duraklar = _simCache[hatKodu]?.duraklar || generateDuraklar(hatKodu);
+  return generateDurakSaatleri(hatKodu, duraklar);
+}
+
+// ── buildBusData: API verisini standart formata çevir ──────
+function buildBusData(otobusler, durakSaatleri) {
+  const now  = new Date();
+  const result = [];
+  const stops  = currentLineData.stops;
+  const n      = stops.length;
+
+  if (durakSaatleri && durakSaatleri.length > 0) {
+    durakSaatleri.forEach(ds => {
+      // Gelen dakikayı parse et — farklı field adları olabilir
+      const minsRaw = field(ds, 'gelis_dakika', 'GELIS_DAKIKA', 'dakika', 'DAKIKA', 'sure', 'SURE');
+      const mins = Math.max(0, parseFloat(minsRaw || 0));
+      const eta  = new Date(now.getTime() + mins * 60000);
+
+      // Otobüsün konumunu bul (kapino eşleşmesi)
+      const kapino = field(ds, 'kapino', 'KAPINO', 'KapiNo');
+      const busLoc = otobusler ? otobusler.find(o =>
+        field(o,'kapino','KAPINO','KapiNo') === kapino
+      ) : null;
+
+      // Otobüsün bulunduğu durak indeksi
+      const durakAdi = busLoc
+        ? (field(busLoc,'yakinDurakAdi','YAKINDURAKI','yakin_durak_adi') || '')
+        : (field(ds,'yakinDurakAdi','YAKINDURAKI') || '');
+
+      const busStopIdx = durakAdi
+        ? stops.findIndex(s => s.adi.toLowerCase().includes(durakAdi.toLowerCase().slice(0,6)))
+        : -1;
+
+      // Dakikadan geriye hesap: 2 dk/durak tahmini
+      const stopsBack = Math.max(1, Math.floor(mins / 2));
+      const estIdx    = busStopIdx >= 0 ? busStopIdx : Math.max(0, currentStopIdx - stopsBack);
+      const progress  = n > 1 ? estIdx / (n-1) : 0.5;
+
+      result.push({
+        line:          currentLine,
+        plate:         kapino || '—',
+        destination:   stops[n-1].adi,
+        mins:          Math.round(mins),
+        eta,
+        currentStop:   durakAdi || stops[Math.max(0, estIdx)].adi,
+        currentStopIdx: estIdx,
+        progress,
+        yon:           field(ds,'yon','YON','Yon') || field(busLoc,'yon','YON') || '',
+        occupancy:     rnd(0, 4)
+      });
+    });
+
+    result.sort((a, b) => a.mins - b.mins);
+
+  } else if (otobusler && otobusler.length > 0) {
+    // Sadece konum verisi varsa tahmini süre hesapla
+    otobusler.slice(0, 5).forEach((o, i) => {
+      const yakinDurak = field(o,'yakinDurakAdi','YAKINDURAKI','yakin_durak_adi') || '—';
+      const busStopIdx = stops.findIndex(s =>
+        s.adi.toLowerCase().includes(yakinDurak.toLowerCase().slice(0, 6))
+      );
+      const bIdx      = busStopIdx >= 0 ? busStopIdx : Math.max(0, currentStopIdx - (i+1)*2);
+      const stopsAway = Math.max(0, currentStopIdx - bIdx);
+      const estMins   = stopsAway * 2 + rnd(0, 2);
+      const eta       = new Date(now.getTime() + estMins * 60000);
+      const progress  = n > 1 ? bIdx / (n-1) : 0.5;
+
+      result.push({
+        line:           currentLine,
+        plate:          field(o,'kapino','KAPINO','KapiNo') || '—',
+        destination:    stops[n-1].adi,
+        mins:           estMins,
+        eta,
+        currentStop:    yakinDurak,
+        currentStopIdx: bIdx,
+        progress,
+        yon:            field(o,'yon','YON','Yon') || '',
+        occupancy:      rnd(0,4)
+      });
+    });
+    result.sort((a,b) => a.mins - b.mins);
+  }
+
+  return result;
+}
+
+// ── UI Helpers ─────────────────────────────────────────────
 function selectLine(line) {
   document.getElementById('lineInput').value = line;
+  if (activeTab !== 'ara') switchTab('ara');
   searchLine();
 }
 
 function addToRecent(line) {
   recentSearches = [line, ...recentSearches.filter(x => x !== line)].slice(0, 8);
+  saveStorage();
   renderRecents();
 }
 
 function renderRecents() {
-  const container = document.getElementById('recentContainer');
-  if (!container) return;
-  if (recentSearches.length === 0) { container.style.display = 'none'; return; }
-  container.style.display = 'block';
-  container.querySelector('.recents-list').innerHTML = recentSearches.map(r =>
+  const c = document.getElementById('recentContainer');
+  if (!c) return;
+  if (recentSearches.length === 0) { c.style.display = 'none'; return; }
+  c.style.display = 'block';
+  c.querySelector('.recents-list').innerHTML = recentSearches.map(r =>
     `<div class="line-chip recent-chip" onclick="selectLine('${r}')">${r}</div>`
   ).join('');
 }
@@ -985,9 +1250,10 @@ function toggleFavorite() {
     favorites = favorites.filter(f => f !== currentLine);
     showNotif(`${currentLine} favorilerden kaldırıldı`);
   } else {
-    favorites = [currentLine, ...favorites].slice(0, 10);
+    favorites = [currentLine, ...favorites].slice(0, 12);
     showNotif(`${currentLine} favorilere eklendi ⭐`);
   }
+  saveStorage();
   updateFavBtn();
 }
 
@@ -1000,34 +1266,43 @@ function updateFavBtn() {
   btn.style.color = isFav ? 'var(--yellow)' : 'var(--muted)';
 }
 
+function renderFavPanel() {
+  const c = document.getElementById('favContent');
+  if (favorites.length === 0) {
+    c.innerHTML = `<div class="empty-state"><div class="empty-icon">⭐</div><p>Henüz favori hat yok</p><p style="margin-top:8px;font-size:10px;color:var(--muted)">Hat arayıp ☆ butonuna basın</p></div>`;
+    return;
+  }
+  c.innerHTML = `
+    <div class="search-label">Favori Hatlar</div>
+    <div class="quick-lines" style="margin-bottom:20px">
+      ${favorites.map(f => `<div class="line-chip fav-chip" onclick="selectLine('${f}');switchTab('ara')">★ ${f}</div>`).join('')}
+    </div>
+  `;
+}
+
 function startCountdown() {
   clearInterval(countdownInterval);
   refreshCountdown = 30;
-  updateCountdownDisplay();
   countdownInterval = setInterval(() => {
-    refreshCountdown--;
-    if (refreshCountdown <= 0) refreshCountdown = 30;
-    updateCountdownDisplay();
+    refreshCountdown = Math.max(0, refreshCountdown - 1);
+    const el = document.getElementById('countdownEl');
+    if (el) el.textContent = `${refreshCountdown}s`;
   }, 1000);
 }
 
-function updateCountdownDisplay() {
-  const el = document.getElementById('countdownEl');
-  if (el) el.textContent = `${refreshCountdown}s`;
-}
-
 function setSimBanner(show) {
-  const bar = document.getElementById('statusBar');
-  if (!bar) return;
-  bar.style.background = show ? 'rgba(250,204,21,0.07)' : 'rgba(34,197,94,0.07)';
-  bar.style.borderColor = show ? 'rgba(250,204,21,0.25)' : 'rgba(34,197,94,0.2)';
-  bar.style.color = show ? 'var(--yellow)' : 'var(--green)';
-  const dot = bar.querySelector('.status-dot');
-  if (dot) dot.style.background = show ? 'var(--yellow)' : 'var(--green)';
+  const bar   = document.getElementById('statusBar');
   const badge = document.getElementById('simBadge');
-  if (badge) badge.style.display = show ? 'inline' : 'none';
+  const dot   = bar?.querySelector('.status-dot');
+  if (!bar) return;
+  bar.style.background   = show ? 'rgba(250,204,21,0.07)' : 'rgba(34,197,94,0.07)';
+  bar.style.borderColor  = show ? 'rgba(250,204,21,0.25)' : 'rgba(34,197,94,0.2)';
+  bar.style.color        = show ? 'var(--yellow)' : 'var(--green)';
+  if (dot)   dot.style.background   = show ? 'var(--yellow)' : 'var(--green)';
+  if (badge) badge.style.display    = show ? 'inline' : 'none';
 }
 
+// ── searchLine ─────────────────────────────────────────────
 async function searchLine() {
   const val = document.getElementById('lineInput').value.trim().toUpperCase();
   if (!val) { showNotif('Lütfen hat numarası girin'); return; }
@@ -1040,35 +1315,38 @@ async function searchLine() {
   document.getElementById('stopSection').style.display = 'none';
   clearInterval(refreshInterval);
   clearInterval(countdownInterval);
+  clearInterval(animInterval);
 
   try {
-    document.getElementById('statusText').textContent = 'IBB API deneniyor...';
-    const [hatBilgisi, duraklar] = await Promise.all([
+    document.getElementById('statusText').textContent = 'IBB API bağlanıyor...';
+    const [hatBilgisi, { data: duraklar, sim }] = await Promise.all([
       fetchHatBilgisi(val),
       fetchHatDuraklar(val)
     ]);
 
     if (!duraklar || duraklar.length === 0) {
-      showError(`"${val}" hattı için veri alınamadı.`);
+      showError(`"${val}" için durak verisi bulunamadı.`);
       return;
     }
 
+    isSimulated = sim;
     addToRecent(val);
     setSimBanner(isSimulated);
 
-    const sortedStops = [...duraklar].sort((a, b) => {
-      return parseInt(a.SIRANO||a.sirano||0) - parseInt(b.SIRANO||b.sirano||0);
-    });
+    const sortedStops = [...duraklar].sort((a, b) =>
+      parseInt(field(a,'SIRANO','sirano','irano') || 0) -
+      parseInt(field(b,'SIRANO','sirano','irano') || 0)
+    );
 
     const hatAdi = hatBilgisi
-      ? (hatBilgisi.HATAD || hatBilgisi.hatad || hatBilgisi.GUZERGAHADI || val)
+      ? (field(hatBilgisi,'HATAD','hatad','GUZERGAHADI','HATADIUZUN') || val)
       : val;
 
     currentLineData = {
       name: hatAdi,
       stops: sortedStops.map(s => ({
-        adi: s.SDURAKADI || s.sdurakadi || s.ADI || '—',
-        kod: s.SDURAKKODU || s.sdurakkodu || s.KOD || ''
+        adi: field(s,'SDURAKADI','sdurakadi','ADI','DURAKKODU') || '—',
+        kod: field(s,'SDURAKKODU','sdurakkodu','KOD','DURAKKODU') || ''
       }))
     };
 
@@ -1080,13 +1358,17 @@ async function searchLine() {
       opt.textContent = `${i+1}. ${s.adi}`;
       stopSelect.appendChild(opt);
     });
-    const mid = Math.floor(currentLineData.stops.length / 3);
-    stopSelect.value = mid;
-    document.getElementById('stopSection').style.display = 'block';
-    document.getElementById('stopCount').textContent = `${currentLineData.stops.length} durak · ${hatAdi}`;
 
-    currentStopIdx = mid;
-    currentStopCode = currentLineData.stops[mid].kod;
+    // Varsayılan: güzergahın 1/3'ü (başlangıca daha yakın)
+    const defaultIdx = Math.floor(currentLineData.stops.length / 4);
+    stopSelect.value = defaultIdx;
+    currentStopIdx   = defaultIdx;
+    currentStopCode  = currentLineData.stops[defaultIdx].kod;
+
+    document.getElementById('stopSection').style.display = 'block';
+    document.getElementById('stopCount').textContent =
+      `${currentLineData.stops.length} durak · ${hatAdi}`;
+
     await loadBuses();
 
   } catch(err) {
@@ -1094,52 +1376,55 @@ async function searchLine() {
   }
 }
 
+// ── loadBuses ──────────────────────────────────────────────
 async function loadBuses() {
-  const stopSelect = document.getElementById('stopSelect');
-  currentStopIdx = parseInt(stopSelect.value);
-  currentStopCode = currentLineData.stops[currentStopIdx].kod;
+  const stopSelect    = document.getElementById('stopSelect');
+  currentStopIdx      = parseInt(stopSelect.value);
+  currentStopCode     = currentLineData.stops[currentStopIdx].kod;
 
-  const modeText = isSimulated ? 'AI simülasyonu çalıştırılıyor...' : 'Otobüs verileri alınıyor...';
-  document.getElementById('statusText').textContent = modeText;
+  document.getElementById('statusText').textContent =
+    isSimulated ? 'Simülasyon verisi hazırlanıyor...' : 'Otobüs konumları alınıyor...';
   showSkeleton();
   clearInterval(refreshInterval);
   clearInterval(countdownInterval);
+  clearInterval(animInterval);
 
   try {
-    const [otobusler, durakSaatleri] = await Promise.all([
+    const [{ data: otobusler }, { data: durakSaatleri, sim }] = await Promise.all([
       fetchHatOtobusler(currentLine),
       fetchDurakSaatleri(currentStopCode, currentLine)
     ]);
 
+    if (sim) isSimulated = true;
     buses = buildBusData(otobusler, durakSaatleri);
 
     if (buses.length === 0) {
-      showEmpty('Şu an bu hatta aktif otobüs yok veya sefer dışı saatleri.');
+      showEmpty('Şu an bu hatta aktif otobüs bulunamadı.');
       document.getElementById('statusText').textContent =
         `${currentLineData.stops[currentStopIdx].adi} · Aktif araç yok`;
       return;
     }
 
     renderAll();
-    const modeSuffix = isSimulated ? ' · AI Simülasyon' : ' · Canlı';
-    document.getElementById('statusText').textContent =
-      `${currentLineData.stops[currentStopIdx].adi} · ${new Date().toLocaleTimeString('tr-TR')}${modeSuffix}`;
-    setSimBanner(isSimulated);
 
+    const sfx = isSimulated ? ' · SİMÜLE' : ' · CANLI';
+    document.getElementById('statusText').textContent =
+      `${currentLineData.stops[currentStopIdx].adi} · ${new Date().toLocaleTimeString('tr-TR')}${sfx}`;
+    setSimBanner(isSimulated);
     startCountdown();
 
+    // 30 sn'de bir yenile
     refreshInterval = setInterval(async () => {
       try {
-        const [ob, ds] = await Promise.all([
+        const [{ data: ob }, { data: ds }] = await Promise.all([
           fetchHatOtobusler(currentLine),
           fetchDurakSaatleri(currentStopCode, currentLine)
         ]);
         buses = buildBusData(ob, ds);
         renderBusList();
         updateStats();
-        const sfx = isSimulated ? ' · AI Simülasyon' : ' · Canlı';
         document.getElementById('statusText').textContent =
-          `${currentLineData.stops[currentStopIdx].adi} · ${new Date().toLocaleTimeString('tr-TR')}${sfx}`;
+          `${currentLineData.stops[currentStopIdx].adi} · ${new Date().toLocaleTimeString('tr-TR')}${isSimulated ? ' · SİMÜLE' : ' · CANLI'}`;
         startCountdown();
       } catch(_) {}
     }, 30000);
@@ -1149,77 +1434,52 @@ async function loadBuses() {
   }
 }
 
-function buildBusData(otobusler, durakSaatleri) {
+// ── Sefer Saatleri Tab ────────────────────────────────────
+async function loadSeferler() {
+  const val = document.getElementById('seferLineInput').value.trim().toUpperCase();
+  if (!val) { showNotif('Lütfen hat numarası girin'); return; }
+
+  const c = document.getElementById('seferlerContent');
+  c.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px">${[1,2,3,4,5].map(()=>`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;gap:14px">
+      <div class="skeleton" style="width:50px;height:18px"></div>
+      <div class="skeleton" style="flex:1;height:18px"></div>
+    </div>`).join('')}</div>`;
+
+  const { data, sim } = await fetchSeferSaatleri(val);
   const now = new Date();
-  const result = [];
+  const nowMin = now.getHours() * 60 + now.getMinutes();
 
-  // Önce geliş süresi verisi varsa onu kullan
-  if (durakSaatleri && durakSaatleri.length > 0) {
-    durakSaatleri.forEach((ds, i) => {
-      const mins = parseFloat(ds.gelis_dakika || ds.GELIS_DAKIKA || ds.dakika || 0);
-      const eta = new Date(now.getTime() + mins * 60000);
-      const busLoc = otobusler ? otobusler.find(o =>
-        o.kapino === ds.kapino || o.guzergahkodu === ds.guzergahkodu
-      ) : null;
-
-      const totalStops = currentLineData.stops.length;
-      const stopsBefore = Math.max(1, Math.floor(mins / 2));
-      const curStopIdx = Math.max(0, currentStopIdx - stopsBefore);
-      const progress = totalStops > 1 ? curStopIdx / (totalStops - 1) : 0.5;
-
-      result.push({
-        line: currentLine,
-        plate: ds.kapino || `—`,
-        destination: currentLineData.stops[currentLineData.stops.length - 1].adi,
-        mins: Math.round(mins),
-        eta,
-        currentStop: busLoc
-          ? (busLoc.yakinDurakAdi || busLoc.yon || currentLineData.stops[curStopIdx].adi)
-          : currentLineData.stops[curStopIdx].adi,
-        progress,
-        currentStopIdx: curStopIdx,
-        yon: ds.yon || busLoc?.yon || '',
-        occupancy: Math.floor(Math.random() * 4)  // API'de doluluk yok, tahmini
-      });
-    });
-  } else if (otobusler && otobusler.length > 0) {
-    // Geliş süresi yoksa anlık konuma göre tahmini hesapla
-    otobusler.slice(0, 5).forEach((o, i) => {
-      const totalStops = currentLineData.stops.length;
-      // Yakın durağa göre tahmini süre hesapla
-      const guzergah = o.guzergahkodu || '';
-      const yakinDurak = o.yakinDurakAdi || o.yon || '—';
-
-      // Hattaki durağın konumunu bul
-      const busStopIdx = currentLineData.stops.findIndex(s =>
-        s.adi.toLowerCase().includes(yakinDurak.toLowerCase().slice(0, 5))
-      );
-      const bIdx = busStopIdx >= 0 ? busStopIdx : Math.max(0, currentStopIdx - (i + 1) * 2);
-      const stopsAway = Math.max(0, currentStopIdx - bIdx);
-      const estMins = stopsAway * 2 + Math.floor(Math.random() * 3);
-      const eta = new Date(now.getTime() + estMins * 60000);
-      const progress = totalStops > 1 ? bIdx / (totalStops - 1) : 0.5;
-
-      result.push({
-        line: currentLine,
-        plate: o.kapino || `—`,
-        destination: currentLineData.stops[currentLineData.stops.length - 1].adi,
-        mins: estMins,
-        eta,
-        currentStop: yakinDurak,
-        progress,
-        currentStopIdx: bIdx,
-        yon: o.yon || '',
-        occupancy: Math.floor(Math.random() * 4)
-      });
-    });
-    result.sort((a, b) => a.mins - b.mins);
+  if (!data || data.length === 0) {
+    c.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>${val} için sefer saati bulunamadı</p></div>`;
+    return;
   }
 
-  return result;
+  const rows = data.map(s => {
+    const saat = field(s, 'SEFERSAATI', 'sefersaati', 'SAAT', 'saat') || '?';
+    const [hh, mm] = saat.split(':').map(Number);
+    const saatMin  = (hh || 0) * 60 + (mm || 0);
+    const gecti    = saatMin < nowMin;
+    const simdi    = !gecti && saatMin - nowMin <= 5;
+    const yon      = field(s,'YON','yon','Yon') || 'GİDİŞ';
+    const cls      = gecti ? 'gecti' : simdi ? 'simdi' : '';
+    return `<tr class="${cls}">
+      <td class="saat-cell">${saat}</td>
+      <td>${yon}</td>
+      <td>${gecti ? 'Geçti' : simdi ? '🟢 Yakında' : `${saatMin - nowMin} dk`}</td>
+    </tr>`;
+  }).join('');
+
+  c.innerHTML = `
+    <div class="section-title">${val} Sefer Saatleri${sim ? ' (Simüle)' : ''}</div>
+    <table class="seferler-table">
+      <thead><tr><th>Saat</th><th>Yön</th><th>Durum</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
 }
 
-// ── Skeleton / Error / Empty ─────────────────────────────────────────────────
+// ── Skeleton / Error / Empty ───────────────────────────────
 function showSkeleton() {
   document.getElementById('mainContent').innerHTML = `
     <div style="display:flex;flex-direction:column;gap:10px">
@@ -1231,10 +1491,8 @@ function showSkeleton() {
             <div class="skeleton" style="height:10px;width:40%"></div>
           </div>
           <div class="skeleton" style="width:40px;height:40px;border-radius:6px"></div>
-        </div>
-      `).join('')}
-    </div>
-  `;
+        </div>`).join('')}
+    </div>`;
 }
 
 function showError(msg) {
@@ -1243,11 +1501,6 @@ function showError(msg) {
       <div class="empty-icon">⚠️</div>
       <p style="color:var(--iett-red)">${msg}</p>
       <p style="margin-top:8px;font-size:10px">Hat kodu doğru mu? Örn: 34T, 500T, 15B, 28</p>
-      <p style="margin-top:6px;font-size:10px;color:var(--muted);line-height:1.7">
-        Claude AI simülasyonu da başarısız oldu.<br>
-        Bu uygulamayı <strong style="color:var(--accent)">GitHub Pages</strong>'e yüklerseniz<br>
-        gerçek İETT verisi çalışır.
-      </p>
     </div>`;
   document.getElementById('statusText').textContent = 'Hata oluştu';
   setSimBanner(false);
@@ -1255,16 +1508,12 @@ function showError(msg) {
 
 function showEmpty(msg) {
   document.getElementById('mainContent').innerHTML = `
-    <div class="empty-state">
-      <div class="empty-icon">🚌</div>
-      <p>${msg}</p>
-    </div>`;
+    <div class="empty-state"><div class="empty-icon">🚌</div><p>${msg}</p></div>`;
 }
 
-// ── Render ───────────────────────────────────────────────────────────────────
+// ── Render ─────────────────────────────────────────────────
 function renderAll() {
-  const nextBus = buses[0];
-  const stopName = currentLineData.stops[currentStopIdx].adi;
+  const nextBus  = buses[0];
 
   document.getElementById('mainContent').innerHTML = `
     <div class="section-title">Yaklaşan Otobüsler</div>
@@ -1310,12 +1559,12 @@ function renderBusList() {
 
   buses.forEach((bus, idx) => {
     const card = document.createElement('div');
-    const cls = bus.mins <= 3 ? 'arriving' : bus.mins <= 8 ? 'soon' : 'later';
+    const cls  = bus.mins <= 3 ? 'arriving' : bus.mins <= 8 ? 'soon' : 'later';
     card.className = `bus-card ${cls}`;
     card.style.animationDelay = `${idx * 0.05}s`;
 
-    const etaStr = bus.eta.toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit' });
-    const occBars = Array(5).fill(0).map((_, i) => {
+    const etaStr  = bus.eta.toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit' });
+    const occBars = Array(5).fill(0).map((_,i) => {
       const filled = i < bus.occupancy ? (bus.occupancy >= 4 ? 'full' : 'filled') : '';
       return `<div class="occ-bar ${filled}"></div>`;
     }).join('');
@@ -1335,10 +1584,9 @@ function renderBusList() {
         <div class="arrival-min" id="busmin-${idx}">${bus.mins}</div>
         <div class="arrival-label">dakika</div>
         <div class="arrival-time">${etaStr}</div>
-      </div>
-    `;
+      </div>`;
 
-    card.onclick = () => showBusDetail(bus, idx);
+    card.onclick = () => showBusDetail(bus);
     list.appendChild(card);
   });
 }
@@ -1347,8 +1595,8 @@ function renderRouteMap() {
   const map = document.getElementById('routeMap');
   if (!map || !buses[0]) return;
   const stops = currentLineData.stops;
-  const n = stops.length;
-  const bus = buses[0];
+  const n     = stops.length;
+  const bus   = buses[0];
 
   let html = `<div style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:14px">
     🚌 <strong style="color:var(--text)">${currentLine}</strong> · ${currentLineData.name}
@@ -1359,22 +1607,20 @@ function renderRouteMap() {
     <div class="route-progress" id="routeProgress" style="width:${Math.round(bus.progress*100)}%"></div>`;
 
   const showCount = Math.min(n, 6);
-  const step = (n - 1) / Math.max(showCount - 1, 1);
-  const shown = Array.from({ length: showCount }, (_, i) => Math.round(i * step));
+  const step      = (n-1) / Math.max(showCount-1, 1);
+  const shown     = Array.from({length: showCount}, (_,i) => Math.round(i * step));
 
   shown.forEach(i => {
-    const pct = n > 1 ? (i / (n - 1)) * 100 : 50;
+    const pct    = n > 1 ? (i/(n-1))*100 : 50;
     const passed = i <= bus.currentStopIdx;
-    const isYou = i === currentStopIdx;
-    const cls = isYou ? 'you' : (passed ? 'passed' : '');
+    const isYou  = i === currentStopIdx;
+    const cls    = isYou ? 'you' : (passed ? 'passed' : '');
     html += `<div class="stop-dot ${cls}" style="left:${pct}%"></div>
              <div class="stop-label" style="left:${pct}%">${stops[i].adi}</div>`;
   });
 
-  const busLeft = Math.round(bus.progress * 100);
-  html += `<div class="bus-icon-moving" id="busIcon" style="left:${busLeft}%">🚌</div>`;
+  html += `<div class="bus-icon-moving" id="busIcon" style="left:${Math.round(bus.progress*100)}%">🚌</div>`;
   html += `</div>`;
-
   html += `<div class="map-legend">
     <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Konumunuz</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--iett-red)"></div>Geçilen durak</div>
@@ -1389,7 +1635,7 @@ function startAnimation() {
   animInterval = setInterval(() => {
     buses.forEach((b, i) => {
       if (b.mins > 0) b.mins = Math.max(0, b.mins - 1/60);
-      b.progress = Math.min(b.progress + 0.0005, 1);
+      b.progress = Math.min(b.progress + 0.0003, 1);
       const el = document.getElementById(`busmin-${i}`);
       if (el) el.textContent = Math.ceil(b.mins);
     });
@@ -1405,26 +1651,50 @@ function updateStats() {
   if (el && buses[0]) el.textContent = Math.ceil(buses[0].mins);
 }
 
+// ── Bus Detail Modal ───────────────────────────────────────
 function showBusDetail(bus) {
-  const etaStr = bus.eta.toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit' });
-  const occText = ['Boş','Az Yolcu','Orta','Kalabalık','Çok Kalabalık'][Math.min(bus.occupancy, 4)];
-  const yonText = bus.yon ? ` · ${bus.yon}` : '';
-  showNotif(`${bus.line} · ${Math.ceil(bus.mins)} dk (${etaStr}) · ${occText}${yonText} · ${bus.plate}`);
+  const etaStr  = bus.eta.toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit' });
+  const occText = ['Boş 🟢','Az Dolu 🟡','Orta 🟠','Kalabalık 🔴','Çok Kalabalık 🔴'][Math.min(bus.occupancy, 4)];
+  const yonText = bus.yon || '—';
+
+  document.getElementById('modalTitle').textContent = `${bus.line} · ${Math.ceil(bus.mins)} dk`;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-row"><span class="modal-key">Varış</span><span class="modal-val">${Math.ceil(bus.mins)} dakika (${etaStr})</span></div>
+    <div class="modal-row"><span class="modal-key">Yön</span><span class="modal-val">${bus.destination}</span></div>
+    <div class="modal-row"><span class="modal-key">Şu An</span><span class="modal-val">${bus.currentStop}</span></div>
+    <div class="modal-row"><span class="modal-key">Plaka</span><span class="modal-val">${bus.plate}</span></div>
+    <div class="modal-row"><span class="modal-key">Güzergah Yönü</span><span class="modal-val">${yonText}</span></div>
+    <div class="modal-row"><span class="modal-key">Doluluk</span><span class="modal-val">${occText}</span></div>
+    <div class="modal-row"><span class="modal-key">İlerleme</span><span class="modal-val">${Math.round(bus.progress*100)}%</span></div>
+  `;
+  document.getElementById('busModal').classList.add('open');
 }
 
+function closeModal() {
+  document.getElementById('busModal').classList.remove('open');
+}
+
+// ── Notification ───────────────────────────────────────────
 function showNotif(msg) {
   const el = document.getElementById('notification');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 4000);
+  setTimeout(() => el.classList.remove('show'), 3500);
 }
 
-// İlk yükleme
+// ── Init ───────────────────────────────────────────────────
 window.addEventListener('load', () => {
-  renderRecents(); // başlangıçta boş
-  // Enter tuşu ile arama
+  renderRecents();
+  renderFavPanel();
   document.getElementById('lineInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') searchLine();
+  });
+  document.getElementById('seferLineInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') loadSeferler();
+  });
+  // Keyboard kısa yol: Escape modal kapat
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
   });
 });
 </script>
