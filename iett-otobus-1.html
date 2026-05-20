@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>İETT Otobüs Takip</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --iett-red: #e8202a;
+    --iett-orange: #f97316;
+    --accent: #38bdf8;
+    --green: #22c55e;
+    --yellow: #facc15;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --border: rgba(255,255,255,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 16px 100px;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-badge {
+    background: var(--iett-red);
+    color: white;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(232,32,42,0.4);
+  }
+
+  .logo-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .time-display {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    text-align: right;
+  }
+
+  .time-display .time-big {
+    font-size: 20px;
+    font-weight: 600;
+    display: block;
+  }
+
+  /* Search */
+  .search-section {
+    margin-bottom: 20px;
+  }
+
+  .search-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .search-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .search-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-input::placeholder {
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+
+  .search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(56,189,248,0.1);
+  }
+
+  .search-btn {
+    background: var(--iett-red);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    color: white;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 0 15px rgba(232,32,42,0.3);
+    white-space: nowrap;
+  }
+
+  .search-btn:hover {
+    background: #c0171f;
+    box-shadow: 0 0 25px rgba(232,32,42,0.5);
+  }
+
+  .search-btn:active { transform: scale(0.97); }
+
+  /* Quick lines */
+  .quick-lines {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .line-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .line-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(56,189,248,0.05);
+  }
+
+  .recent-chip {
+    border-color: rgba(250,204,21,0.2);
+    color: var(--yellow);
+    background: rgba(250,204,21,0.04);
+  }
+
+  .recent-chip:hover {
+    border-color: var(--yellow);
+    background: rgba(250,204,21,0.08);
+    color: var(--yellow);
+  }
+
+  /* Stop selector */
+  .stop-section {
+    margin-bottom: 20px;
+  }
+
+  .stop-select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    transition: border-color 0.2s;
+  }
+
+  .stop-select:focus { border-color: var(--accent); }
+  .stop-select option { background: var(--surface); }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(34,197,94,0.07);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: var(--green);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* Section title */
+  .section-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Bus cards */
+  .buses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .bus-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.4s ease forwards;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+
+  .bus-card:hover {
+    border-color: rgba(56,189,248,0.2);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  @keyframes slideIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .bus-card:nth-child(1) { animation-delay: 0.05s; }
+  .bus-card:nth-child(2) { animation-delay: 0.1s; }
+  .bus-card:nth-child(3) { animation-delay: 0.15s; }
+  .bus-card:nth-child(4) { animation-delay: 0.2s; }
+
+  .bus-card.arriving {
+    border-color: rgba(34,197,94,0.3);
+    background: linear-gradient(135deg, rgba(34,197,94,0.05), var(--surface));
+  }
+
+  .bus-card.arriving::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--green);
+    border-radius: 12px 0 0 12px;
+  }
+
+  .bus-card.soon::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--yellow);
+    border-radius: 12px 0 0 12px;
+  }
+
+  .bus-card.later::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--muted);
+    border-radius: 12px 0 0 12px;
+  }
+
+  .bus-line-badge {
+    background: var(--iett-red);
+    color: white;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    min-width: 52px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .bus-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .bus-destination {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 3px;
+  }
+
+  .bus-details {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bus-details .plate {
+    background: var(--surface2);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+  }
+
+  .arrival-block {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .arrival-min {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    line-height: 1;
+    color: var(--green);
+  }
+
+  .bus-card.soon .arrival-min { color: var(--yellow); }
+  .bus-card.later .arrival-min { color: var(--muted); }
+
+  .arrival-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .arrival-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Occupancy */
+  .occupancy {
+    display: flex;
+    gap: 2px;
+    margin-top: 4px;
+  }
+
+  .occ-bar {
+    width: 6px;
+    height: 12px;
+    border-radius: 2px;
+    background: var(--surface2);
+  }
+
+  .occ-bar.filled { background: var(--accent); }
+  .occ-bar.full { background: var(--iett-red); }
+
+  /* Map section */
+  .map-section {
+    margin-bottom: 24px;
+  }
+
+  .bus-route-map {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .route-line-container {
+    position: relative;
+    height: 60px;
+    display: flex;
+    align-items: center;
+  }
+
+  .route-track {
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 3px;
+    background: var(--surface2);
+    transform: translateY(-50%);
+    border-radius: 2px;
+  }
+
+  .route-progress {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--iett-red), var(--iett-orange));
+    transform: translateY(-50%);
+    border-radius: 2px;
+    transition: width 1s ease;
+    box-shadow: 0 0 8px rgba(232,32,42,0.5);
+  }
+
+  .stop-dot {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--muted);
+    border: 2px solid var(--surface);
+    z-index: 2;
+  }
+
+  .stop-dot.passed { background: var(--iett-red); }
+  .stop-dot.current {
+    background: var(--surface);
+    border-color: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    width: 14px;
+    height: 14px;
+  }
+
+  .stop-dot.you {
+    background: var(--green);
+    border-color: var(--surface);
+    box-shadow: 0 0 10px var(--green);
+    width: 14px;
+    height: 14px;
+  }
+
+  .stop-label {
+    position: absolute;
+    top: calc(50% + 14px);
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--muted);
+    white-space: nowrap;
+    text-align: center;
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bus-icon-moving {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    font-size: 20px;
+    transition: left 1s ease;
+    filter: drop-shadow(0 0 6px rgba(232,32,42,0.6));
+  }
+
+  .map-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Refresh btn */
+  .refresh-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 20px;
+  }
+
+  .refresh-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(56,189,248,0.04);
+  }
+
+  .refresh-icon { transition: transform 0.6s ease; }
+  .refresh-btn:hover .refresh-icon { transform: rotate(360deg); }
+
+  /* Notifications */
+  .notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--surface);
+    border: 1px solid var(--green);
+    border-radius: 10px;
+    padding: 12px 20px;
+    color: var(--green);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    z-index: 100;
+    box-shadow: 0 0 30px rgba(34,197,94,0.2);
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+    max-width: calc(100vw - 32px);
+  }
+
+  .notification.show { transform: translateX(-50%) translateY(0); }
+
+  /* Loading skeleton */
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 6px;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+  }
+
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+  .empty-state p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  /* Scroll hint */
+  .scroll-hint {
+    text-align: center;
+    padding: 10px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-badge">İETT</div>
+      <div class="logo-text">İstanbul<br>Otobüs Takip</div>
+    </div>
+    <div class="time-display">
+      <span class="time-big" id="clock">--:--</span>
+      <span id="date-display" style="font-size:10px; color: var(--muted)">Yükleniyor...</span>
+    </div>
+  </header>
+
+  <!-- Search -->
+  <div class="search-section">
+    <div class="search-label">Hat Numarası</div>
+    <div class="search-row">
+      <input class="search-input" id="lineInput" type="text" placeholder="örn. 34T, 500T..." maxlength="6"
+        onkeydown="if(event.key==='Enter') searchLine()">
+      <button class="search-btn" onclick="searchLine()">ARA</button>
+    </div>
+    <div class="quick-lines">
+      <div class="line-chip" onclick="selectLine('34T')">34T</div>
+      <div class="line-chip" onclick="selectLine('15B')">15B</div>
+      <div class="line-chip" onclick="selectLine('500T')">500T</div>
+      <div class="line-chip" onclick="selectLine('28')">28</div>
+      <div class="line-chip" onclick="selectLine('17B')">17B</div>
+      <div class="line-chip" onclick="selectLine('43R')">43R</div>
+    </div>
+  </div>
+
+  <!-- Son Aramalar -->
+  <div id="recentContainer" style="display:none;margin-bottom:14px">
+    <div class="search-label">Son Aramalar</div>
+    <div class="quick-lines recents-list"></div>
+  </div>
+
+  <!-- Stop selector -->
+  <div class="stop-section" id="stopSection" style="display:none">
+    <div class="search-label" style="display:flex;justify-content:space-between;align-items:center">
+      <span>Durak Seç</span>
+      <span id="stopCount" style="font-size:10px;color:var(--muted)"></span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <select class="stop-select" id="stopSelect" onchange="loadBuses()" style="flex:1"></select>
+      <button id="favBtn" onclick="toggleFavorite()" title="Favorilere ekle"
+        style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:18px;cursor:pointer;color:var(--muted);transition:all 0.2s;flex-shrink:0">☆</button>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="status-bar" id="statusBar" style="display:none">
+    <div class="status-dot"></div>
+    <span id="statusText" style="flex:1">Canlı veri alınıyor...</span>
+    <span id="countdownEl" style="font-size:10px;opacity:0.6;margin-left:auto"></span>
+  </div>
+
+  <!-- Main content -->
+  <div id="mainContent">
+    <div class="empty-state">
+      <div class="empty-icon">🚌</div>
+      <p>Hat numarası girin<br>Gerçek İETT verisi yüklenecek</p>
+      <p style="margin-top:8px;font-size:10px;color:var(--muted)">Örn: 34T · 15B · 500T · 28 · 43R</p>
+    </div>
+  </div>
+</div>
+
+<!-- Notification -->
+<div class="notification" id="notification"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  İETT GERÇEK API ENTEGRASYONU
+//  IBB JSON REST API + CORS proxy ile çalışır
+//  Proxy sıralaması: corsproxy.io → allorigins → thingproxy
+// ══════════════════════════════════════════════════════
+
+const IETT_BASE = "https://api.ibb.gov.tr/iett";
+
+const CORS_PROXIES = [
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://thingproxy.freeboard.io/fetch/${url}`
+];
+
+// ── State ───────────────────────────────────────────────────────────────────
+let currentLine = null;
+let currentLineData = null;
+let currentStopCode = null;
+let currentStopIdx = 0;
+let buses = [];
+let refreshInterval = null;
+let animInterval = null;
+let refreshCountdown = 30;
+let countdownInterval = null;
+let recentSearches = [];   // Son aramalar (session)
+let favorites = [];        // Favoriler (session)
+
+// ── Clock ───────────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+  const days = ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
+  document.getElementById('date-display').textContent =
+    days[now.getDay()] + ' ' + now.toLocaleDateString('tr-TR', { day:'2-digit', month:'short' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── CORS Proxy ile IBB REST API çağrısı ────────────────────────────────────
+async function iettFetch(path) {
+  const targetUrl = IETT_BASE + path;
+  let lastErr;
+
+  for (const proxyFn of CORS_PROXIES) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 9000);
+      const resp = await fetch(proxyFn(targetUrl), { signal: controller.signal });
+      clearTimeout(timer);
+      if (!resp.ok) continue;
+      const text = await resp.text();
+      return parseIETTResponse(text);
+    } catch(e) {
+      lastErr = e;
+      console.warn('Proxy başarısız, sonraki deneniyor:', e.message);
+    }
+  }
+  throw lastErr || new Error('Tüm proxy sunucuları başarısız');
+}
+
+function parseIETTResponse(text) {
+  // IBB API bazen JSON içinde JSON (double-encoded) döndürür
+  text = text.trim();
+  try {
+    const parsed = JSON.parse(text);
+    if (typeof parsed === 'string') return JSON.parse(parsed);
+    return parsed;
+  } catch {
+    // Bazen başında/sonunda çift tırnak ve kaçış karakterleri olur
+    try {
+      const unescaped = text.replace(/^"|"$/g, '').replace(/\\"/g, '"').replace(/\\\//g, '/');
+      return JSON.parse(unescaped);
+    } catch(e2) {
+      console.error('JSON parse hatası:', text.slice(0, 200));
+      throw new Error('API yanıtı parse edilemedi');
+    }
+  }
+}
+
+// ── API Fonksiyonları ────────────────────────────────────────────────────────
+async function fetchHatBilgisi(hatKodu) {
+  try {
+    const data = await iettFetch(
+      `/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHat_json?HatKodu=${encodeURIComponent(hatKodu)}`
+    );
+    return Array.isArray(data) ? (data[0] || null) : null;
+  } catch(e) {
+    console.error('fetchHatBilgisi error:', e);
+    return null;
+  }
+}
+
+async function fetchHatDuraklar(hatKodu) {
+  const data = await iettFetch(
+    `/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHatDurakList_json?HatKodu=${encodeURIComponent(hatKodu)}`
+  );
+  return Array.isArray(data) ? data : null;
+}
+
+async function fetchHatOtobusler(hatKodu) {
+  try {
+    const data = await iettFetch(
+      `/FiloDurum/SeferGerceklesme.asmx/GetHatOtoKonum_json?HatKodu=${encodeURIComponent(hatKodu)}`
+    );
+    return Array.isArray(data) ? data : null;
+  } catch(e) {
+    console.error('fetchHatOtobusler error:', e);
+    return null;
+  }
+}
+
+async function fetchDurakSaatleri(durakKodu, hatKodu) {
+  try {
+    const data = await iettFetch(
+      `/UlasimAnaVeri/HatDurakGuzergah.asmx/GetDurakHatSaati_json?DurakKodu=${encodeURIComponent(durakKodu)}&HatKodu=${encodeURIComponent(hatKodu)}`
+    );
+    return Array.isArray(data) ? data : [];
+  } catch(e) {
+    console.error('fetchDurakSaatleri error:', e);
+    return [];
+  }
+}
+
+// ── UI Helpers ───────────────────────────────────────────────────────────────
+function selectLine(line) {
+  document.getElementById('lineInput').value = line;
+  searchLine();
+}
+
+function addToRecent(line) {
+  recentSearches = [line, ...recentSearches.filter(x => x !== line)].slice(0, 8);
+  renderRecents();
+}
+
+function renderRecents() {
+  const container = document.getElementById('recentContainer');
+  if (!container) return;
+  if (recentSearches.length === 0) { container.style.display = 'none'; return; }
+  container.style.display = 'block';
+  container.querySelector('.recents-list').innerHTML = recentSearches.map(r =>
+    `<div class="line-chip recent-chip" onclick="selectLine('${r}')">${r}</div>`
+  ).join('');
+}
+
+function toggleFavorite() {
+  if (!currentLine) return;
+  const isFav = favorites.includes(currentLine);
+  if (isFav) {
+    favorites = favorites.filter(f => f !== currentLine);
+    showNotif(`${currentLine} favorilerden kaldırıldı`);
+  } else {
+    favorites = [currentLine, ...favorites].slice(0, 10);
+    showNotif(`${currentLine} favorilere eklendi ⭐`);
+  }
+  updateFavBtn();
+}
+
+function updateFavBtn() {
+  const btn = document.getElementById('favBtn');
+  if (!btn) return;
+  const isFav = favorites.includes(currentLine);
+  btn.textContent = isFav ? '★' : '☆';
+  btn.title = isFav ? 'Favorilerden çıkar' : 'Favorilere ekle';
+  btn.style.color = isFav ? 'var(--yellow)' : 'var(--muted)';
+}
+
+function startCountdown() {
+  clearInterval(countdownInterval);
+  refreshCountdown = 30;
+  updateCountdownDisplay();
+  countdownInterval = setInterval(() => {
+    refreshCountdown--;
+    if (refreshCountdown <= 0) refreshCountdown = 30;
+    updateCountdownDisplay();
+  }, 1000);
+}
+
+function updateCountdownDisplay() {
+  const el = document.getElementById('countdownEl');
+  if (el) el.textContent = `${refreshCountdown}s`;
+}
+
+async function searchLine() {
+  const val = document.getElementById('lineInput').value.trim().toUpperCase();
+  if (!val) { showNotif('Lütfen hat numarası girin'); return; }
+
+  currentLine = val;
+  showSkeleton();
+  document.getElementById('statusBar').style.display = 'flex';
+  document.getElementById('statusText').textContent = `${val} hattı aranıyor...`;
+  document.getElementById('stopSection').style.display = 'none';
+  clearInterval(refreshInterval);
+  clearInterval(countdownInterval);
+
+  try {
+    document.getElementById('statusText').textContent = 'İETT API\'ye bağlanıyor...';
+    const [hatBilgisi, duraklar] = await Promise.all([
+      fetchHatBilgisi(val),
+      fetchHatDuraklar(val)
+    ]);
+
+    if (!duraklar || duraklar.length === 0) {
+      showError(`"${val}" hattı bulunamadı veya aktif değil.`);
+      return;
+    }
+
+    addToRecent(val);
+
+    const sortedStops = [...duraklar].sort((a, b) => {
+      const ai = parseInt(a.SIRANO || a.sirano || 0);
+      const bi = parseInt(b.SIRANO || b.sirano || 0);
+      return ai - bi;
+    });
+
+    const hatAdi = hatBilgisi
+      ? (hatBilgisi.HATAD || hatBilgisi.hatad || hatBilgisi.GUZERGAHADI || val)
+      : val;
+
+    currentLineData = {
+      name: hatAdi,
+      stops: sortedStops.map(s => ({
+        adi: s.SDURAKADI || s.sdurakadi || s.ADI || '—',
+        kod: s.SDURAKKODU || s.sdurakkodu || s.KOD || ''
+      }))
+    };
+
+    const stopSelect = document.getElementById('stopSelect');
+    stopSelect.innerHTML = '';
+    currentLineData.stops.forEach((s, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `${i+1}. ${s.adi}`;
+      stopSelect.appendChild(opt);
+    });
+    const mid = Math.floor(currentLineData.stops.length / 3);
+    stopSelect.value = mid;
+    document.getElementById('stopSection').style.display = 'block';
+    document.getElementById('stopCount').textContent = `${currentLineData.stops.length} durak · ${hatAdi}`;
+
+    currentStopIdx = mid;
+    currentStopCode = currentLineData.stops[mid].kod;
+    await loadBuses();
+
+  } catch(err) {
+    showError('API bağlantı hatası: ' + err.message);
+  }
+}
+
+async function loadBuses() {
+  const stopSelect = document.getElementById('stopSelect');
+  currentStopIdx = parseInt(stopSelect.value);
+  currentStopCode = currentLineData.stops[currentStopIdx].kod;
+
+  document.getElementById('statusText').textContent = 'Otobüs verileri alınıyor...';
+  showSkeleton();
+  clearInterval(refreshInterval);
+  clearInterval(countdownInterval);
+
+  try {
+    const [otobusler, durakSaatleri] = await Promise.all([
+      fetchHatOtobusler(currentLine),
+      fetchDurakSaatleri(currentStopCode, currentLine)
+    ]);
+
+    buses = buildBusData(otobusler, durakSaatleri);
+
+    if (buses.length === 0) {
+      showEmpty('Şu an bu hatta aktif otobüs yok veya sefer dışı saatleri.');
+      document.getElementById('statusText').textContent =
+        `${currentLineData.stops[currentStopIdx].adi} · Aktif araç yok`;
+      return;
+    }
+
+    renderAll();
+    document.getElementById('statusText').textContent =
+      `${currentLineData.stops[currentStopIdx].adi} · ${new Date().toLocaleTimeString('tr-TR')} · Canlı`;
+
+    startCountdown();
+
+    // 30 saniyede bir otomatik yenile
+    refreshInterval = setInterval(async () => {
+      try {
+        const [ob, ds] = await Promise.all([
+          fetchHatOtobusler(currentLine),
+          fetchDurakSaatleri(currentStopCode, currentLine)
+        ]);
+        buses = buildBusData(ob, ds);
+        renderBusList();
+        updateStats();
+        document.getElementById('statusText').textContent =
+          `${currentLineData.stops[currentStopIdx].adi} · ${new Date().toLocaleTimeString('tr-TR')} · Canlı`;
+        startCountdown();
+      } catch(_) {}
+    }, 30000);
+
+  } catch(err) {
+    showError('Veri alınamadı: ' + err.message);
+  }
+}
+
+function buildBusData(otobusler, durakSaatleri) {
+  const now = new Date();
+  const result = [];
+
+  // Önce geliş süresi verisi varsa onu kullan
+  if (durakSaatleri && durakSaatleri.length > 0) {
+    durakSaatleri.forEach((ds, i) => {
+      const mins = parseFloat(ds.gelis_dakika || ds.GELIS_DAKIKA || ds.dakika || 0);
+      const eta = new Date(now.getTime() + mins * 60000);
+      const busLoc = otobusler ? otobusler.find(o =>
+        o.kapino === ds.kapino || o.guzergahkodu === ds.guzergahkodu
+      ) : null;
+
+      const totalStops = currentLineData.stops.length;
+      const stopsBefore = Math.max(1, Math.floor(mins / 2));
+      const curStopIdx = Math.max(0, currentStopIdx - stopsBefore);
+      const progress = totalStops > 1 ? curStopIdx / (totalStops - 1) : 0.5;
+
+      result.push({
+        line: currentLine,
+        plate: ds.kapino || `—`,
+        destination: currentLineData.stops[currentLineData.stops.length - 1].adi,
+        mins: Math.round(mins),
+        eta,
+        currentStop: busLoc
+          ? (busLoc.yakinDurakAdi || busLoc.yon || currentLineData.stops[curStopIdx].adi)
+          : currentLineData.stops[curStopIdx].adi,
+        progress,
+        currentStopIdx: curStopIdx,
+        yon: ds.yon || busLoc?.yon || '',
+        occupancy: Math.floor(Math.random() * 4)  // API'de doluluk yok, tahmini
+      });
+    });
+  } else if (otobusler && otobusler.length > 0) {
+    // Geliş süresi yoksa anlık konuma göre tahmini hesapla
+    otobusler.slice(0, 5).forEach((o, i) => {
+      const totalStops = currentLineData.stops.length;
+      // Yakın durağa göre tahmini süre hesapla
+      const guzergah = o.guzergahkodu || '';
+      const yakinDurak = o.yakinDurakAdi || o.yon || '—';
+
+      // Hattaki durağın konumunu bul
+      const busStopIdx = currentLineData.stops.findIndex(s =>
+        s.adi.toLowerCase().includes(yakinDurak.toLowerCase().slice(0, 5))
+      );
+      const bIdx = busStopIdx >= 0 ? busStopIdx : Math.max(0, currentStopIdx - (i + 1) * 2);
+      const stopsAway = Math.max(0, currentStopIdx - bIdx);
+      const estMins = stopsAway * 2 + Math.floor(Math.random() * 3);
+      const eta = new Date(now.getTime() + estMins * 60000);
+      const progress = totalStops > 1 ? bIdx / (totalStops - 1) : 0.5;
+
+      result.push({
+        line: currentLine,
+        plate: o.kapino || `—`,
+        destination: currentLineData.stops[currentLineData.stops.length - 1].adi,
+        mins: estMins,
+        eta,
+        currentStop: yakinDurak,
+        progress,
+        currentStopIdx: bIdx,
+        yon: o.yon || '',
+        occupancy: Math.floor(Math.random() * 4)
+      });
+    });
+    result.sort((a, b) => a.mins - b.mins);
+  }
+
+  return result;
+}
+
+// ── Skeleton / Error / Empty ─────────────────────────────────────────────────
+function showSkeleton() {
+  document.getElementById('mainContent').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${[1,2,3].map(()=>`
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;gap:14px;align-items:center">
+          <div class="skeleton" style="width:52px;height:44px;border-radius:6px"></div>
+          <div style="flex:1">
+            <div class="skeleton" style="height:14px;width:60%;margin-bottom:8px"></div>
+            <div class="skeleton" style="height:10px;width:40%"></div>
+          </div>
+          <div class="skeleton" style="width:40px;height:40px;border-radius:6px"></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function showError(msg) {
+  document.getElementById('mainContent').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">⚠️</div>
+      <p style="color:var(--iett-red)">${msg}</p>
+      <p style="margin-top:8px;font-size:10px">Hat kodu doğru mu? Örn: 34T, 500T, 15B, 28</p>
+    </div>`;
+  document.getElementById('statusText').textContent = 'Hata oluştu';
+}
+
+function showEmpty(msg) {
+  document.getElementById('mainContent').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">🚌</div>
+      <p>${msg}</p>
+    </div>`;
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function renderAll() {
+  const nextBus = buses[0];
+  const stopName = currentLineData.stops[currentStopIdx].adi;
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="section-title">Yaklaşan Otobüsler</div>
+    <div class="buses-list" id="busesList"></div>
+
+    <div class="section-title">Hat Haritası</div>
+    <div class="map-section">
+      <div class="bus-route-map" id="routeMap"></div>
+    </div>
+
+    <div class="section-title">Hat Bilgisi</div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="statNext">${nextBus ? nextBus.mins : '—'}</div>
+        <div class="stat-label">DK / Sıradaki</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${currentLineData.stops.length}</div>
+        <div class="stat-label">Durak Sayısı</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${buses.length}</div>
+        <div class="stat-label">Aktif Araç</div>
+      </div>
+    </div>
+
+    <button class="refresh-btn" onclick="loadBuses()">
+      <span class="refresh-icon">↻</span>
+      <span>Yenile</span>
+    </button>
+  `;
+
+  renderBusList();
+  renderRouteMap();
+  startAnimation();
+  updateFavBtn();
+}
+
+function renderBusList() {
+  const list = document.getElementById('busesList');
+  if (!list) return;
+  list.innerHTML = '';
+
+  buses.forEach((bus, idx) => {
+    const card = document.createElement('div');
+    const cls = bus.mins <= 3 ? 'arriving' : bus.mins <= 8 ? 'soon' : 'later';
+    card.className = `bus-card ${cls}`;
+    card.style.animationDelay = `${idx * 0.05}s`;
+
+    const etaStr = bus.eta.toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit' });
+    const occBars = Array(5).fill(0).map((_, i) => {
+      const filled = i < bus.occupancy ? (bus.occupancy >= 4 ? 'full' : 'filled') : '';
+      return `<div class="occ-bar ${filled}"></div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="bus-line-badge">${bus.line}</div>
+      <div class="bus-info">
+        <div class="bus-destination">${bus.destination}</div>
+        <div class="bus-details">
+          <span>${bus.currentStop}</span>
+          <span style="color:var(--border)">|</span>
+          <span class="plate">${bus.plate}</span>
+        </div>
+        <div class="occupancy" title="Doluluk (tahmini)">${occBars}</div>
+      </div>
+      <div class="arrival-block">
+        <div class="arrival-min" id="busmin-${idx}">${bus.mins}</div>
+        <div class="arrival-label">dakika</div>
+        <div class="arrival-time">${etaStr}</div>
+      </div>
+    `;
+
+    card.onclick = () => showBusDetail(bus, idx);
+    list.appendChild(card);
+  });
+}
+
+function renderRouteMap() {
+  const map = document.getElementById('routeMap');
+  if (!map || !buses[0]) return;
+  const stops = currentLineData.stops;
+  const n = stops.length;
+  const bus = buses[0];
+
+  let html = `<div style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:14px">
+    🚌 <strong style="color:var(--text)">${currentLine}</strong> · ${currentLineData.name}
+  </div>`;
+
+  html += `<div class="route-line-container">
+    <div class="route-track"></div>
+    <div class="route-progress" id="routeProgress" style="width:${Math.round(bus.progress*100)}%"></div>`;
+
+  const showCount = Math.min(n, 6);
+  const step = (n - 1) / Math.max(showCount - 1, 1);
+  const shown = Array.from({ length: showCount }, (_, i) => Math.round(i * step));
+
+  shown.forEach(i => {
+    const pct = n > 1 ? (i / (n - 1)) * 100 : 50;
+    const passed = i <= bus.currentStopIdx;
+    const isYou = i === currentStopIdx;
+    const cls = isYou ? 'you' : (passed ? 'passed' : '');
+    html += `<div class="stop-dot ${cls}" style="left:${pct}%"></div>
+             <div class="stop-label" style="left:${pct}%">${stops[i].adi}</div>`;
+  });
+
+  const busLeft = Math.round(bus.progress * 100);
+  html += `<div class="bus-icon-moving" id="busIcon" style="left:${busLeft}%">🚌</div>`;
+  html += `</div>`;
+
+  html += `<div class="map-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Konumunuz</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--iett-red)"></div>Geçilen durak</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--muted)"></div>Gelecek durak</div>
+  </div>`;
+
+  map.innerHTML = html;
+}
+
+function startAnimation() {
+  clearInterval(animInterval);
+  animInterval = setInterval(() => {
+    buses.forEach((b, i) => {
+      if (b.mins > 0) b.mins = Math.max(0, b.mins - 1/60);
+      b.progress = Math.min(b.progress + 0.0005, 1);
+      const el = document.getElementById(`busmin-${i}`);
+      if (el) el.textContent = Math.ceil(b.mins);
+    });
+    const icon = document.getElementById('busIcon');
+    if (icon && buses[0]) icon.style.left = Math.round(buses[0].progress * 100) + '%';
+    const prog = document.getElementById('routeProgress');
+    if (prog && buses[0]) prog.style.width = Math.round(buses[0].progress * 100) + '%';
+  }, 1000);
+}
+
+function updateStats() {
+  const el = document.getElementById('statNext');
+  if (el && buses[0]) el.textContent = Math.ceil(buses[0].mins);
+}
+
+function showBusDetail(bus) {
+  const etaStr = bus.eta.toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit' });
+  const occText = ['Boş','Az Yolcu','Orta','Kalabalık','Çok Kalabalık'][Math.min(bus.occupancy, 4)];
+  const yonText = bus.yon ? ` · ${bus.yon}` : '';
+  showNotif(`${bus.line} · ${Math.ceil(bus.mins)} dk (${etaStr}) · ${occText}${yonText} · ${bus.plate}`);
+}
+
+function showNotif(msg) {
+  const el = document.getElementById('notification');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+// İlk yükleme
+window.addEventListener('load', () => {
+  renderRecents(); // başlangıçta boş
+  // Enter tuşu ile arama
+  document.getElementById('lineInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') searchLine();
+  });
+});
+</script>
+</body>
+</html>
