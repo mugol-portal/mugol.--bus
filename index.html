@@ -746,7 +746,8 @@
   <div class="status-bar" id="statusBar" style="display:none">
     <div class="status-dot"></div>
     <span id="statusText" style="flex:1">Canlı veri alınıyor...</span>
-    <span id="countdownEl" style="font-size:10px;opacity:0.6;margin-left:auto"></span>
+    <span id="simBadge" style="display:none;font-size:9px;background:rgba(250,204,21,0.15);border:1px solid rgba(250,204,21,0.3);border-radius:4px;padding:2px 6px;letter-spacing:1px">SİMÜLE</span>
+    <span id="countdownEl" style="font-size:10px;opacity:0.6;margin-left:6px"></span>
   </div>
 
   <!-- Main content -->
@@ -764,17 +765,20 @@
 
 <script>
 // ══════════════════════════════════════════════════════
-//  İETT GERÇEK API ENTEGRASYONU
-//  IBB JSON REST API + CORS proxy ile çalışır
-//  Proxy sıralaması: corsproxy.io → allorigins → thingproxy
+//  İETT OTOBÜS TAKİP
+//  Strateji: Gerçek IBB API (CORS proxy) → Claude AI Simülasyon
+//  Gerçek API başarısız olunca Claude AI gerçekçi veri üretir
 // ══════════════════════════════════════════════════════
 
 const IETT_BASE = "https://api.ibb.gov.tr/iett";
 
+// CORS proxy sırası (5 farklı servis)
 const CORS_PROXIES = [
   url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
   url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  url => `https://thingproxy.freeboard.io/fetch/${url}`
+  url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+  url => `https://proxy.cors.sh/${url}`,
+  url => `https://cors.eu.org/${url}`,
 ];
 
 // ── State ───────────────────────────────────────────────────────────────────
@@ -787,8 +791,9 @@ let refreshInterval = null;
 let animInterval = null;
 let refreshCountdown = 30;
 let countdownInterval = null;
-let recentSearches = [];   // Son aramalar (session)
-let favorites = [];        // Favoriler (session)
+let recentSearches = [];
+let favorites = [];
+let isSimulated = false;
 
 // ── Clock ───────────────────────────────────────────────────────────────────
 function updateClock() {
@@ -802,89 +807,129 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// ── CORS Proxy ile IBB REST API çağrısı ────────────────────────────────────
+// ── IBB REST API: CORS Proxy ─────────────────────────────────────────────────
 async function iettFetch(path) {
   const targetUrl = IETT_BASE + path;
-  let lastErr;
 
-  for (const proxyFn of CORS_PROXIES) {
+  // Önce direkt (bazı tarayıcılar/ortamlar çalışabilir)
+  try {
+    const r = await fetch(targetUrl, { signal: AbortSignal.timeout(4000) });
+    if (r.ok) return parseIETTJSON(await r.text());
+  } catch {}
+
+  // CORS proxy sırası
+  for (const proxy of CORS_PROXIES) {
     try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 9000);
-      const resp = await fetch(proxyFn(targetUrl), { signal: controller.signal });
-      clearTimeout(timer);
-      if (!resp.ok) continue;
-      const text = await resp.text();
-      return parseIETTResponse(text);
+      const r = await fetch(proxy(targetUrl), { signal: AbortSignal.timeout(10000) });
+      if (!r.ok) continue;
+      return parseIETTJSON(await r.text());
     } catch(e) {
-      lastErr = e;
-      console.warn('Proxy başarısız, sonraki deneniyor:', e.message);
+      console.warn('Proxy başarısız:', proxy(targetUrl).slice(0,40), e.message);
     }
   }
-  throw lastErr || new Error('Tüm proxy sunucuları başarısız');
+  throw new Error('CORS_FAIL');
 }
 
-function parseIETTResponse(text) {
-  // IBB API bazen JSON içinde JSON (double-encoded) döndürür
+function parseIETTJSON(text) {
   text = text.trim();
   try {
-    const parsed = JSON.parse(text);
-    if (typeof parsed === 'string') return JSON.parse(parsed);
-    return parsed;
+    const p = JSON.parse(text);
+    return typeof p === 'string' ? JSON.parse(p) : p;
   } catch {
-    // Bazen başında/sonunda çift tırnak ve kaçış karakterleri olur
-    try {
-      const unescaped = text.replace(/^"|"$/g, '').replace(/\\"/g, '"').replace(/\\\//g, '/');
-      return JSON.parse(unescaped);
-    } catch(e2) {
-      console.error('JSON parse hatası:', text.slice(0, 200));
-      throw new Error('API yanıtı parse edilemedi');
-    }
+    const u = text.replace(/^"|"$/g,'').replace(/\\"/g,'"').replace(/\\\//g,'/');
+    return JSON.parse(u);
   }
 }
 
-// ── API Fonksiyonları ────────────────────────────────────────────────────────
+// ── Claude AI Simülasyon Fallback ─────────────────────────────────────────────
+async function claudeSimulate(prompt) {
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1200,
+      system: `Sen İstanbul İETT otobüs hattı simülatörüsün. 
+Gerçek İstanbul coğrafyasına dayalı gerçekçi simüle veri üret.
+YALNIZCA geçerli JSON döndür. Açıklama, markdown, kod bloğu kullanma.`,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message || 'Claude API hatası');
+  const txt = d.content?.find(b => b.type==="text")?.text || '{}';
+  return JSON.parse(txt.replace(/```json\n?|```\n?/g,'').trim());
+}
+
+async function simulateHatDuraklar(hatKodu) {
+  return claudeSimulate(`"${hatKodu}" İETT hattı için gerçekçi durak listesi üret.
+İstanbul'un gerçek semtlerini kullan (Kadıköy, Üsküdar, Beşiktaş, Taksim, vb.).
+Bu hattın güzergahına uygun 18-28 durak oluştur.
+
+JSON formatı (başka hiçbir şey yazma):
+[
+  {"SDURAKADI":"DURAK ADI","SDURAKKODU":"${hatKodu.replace(/\D/g,'')}001","SIRANO":"1"},
+  {"SDURAKADI":"DURAK ADI","SDURAKKODU":"${hatKodu.replace(/\D/g,'')}002","SIRANO":"2"}
+]`);
+}
+
+async function simulateOtobusler(hatKodu) {
+  const now = new Date();
+  return claudeSimulate(`"${hatKodu}" İETT hattı için ${now.toLocaleTimeString('tr-TR')} saatindeki anlık otobüs verileri.
+2-5 aktif otobüs üret. İstanbul plakası formatı: 34 XX 1234.
+
+JSON formatı (başka hiçbir şey yazma):
+[
+  {"kapino":"34 XX 1234","yon":"İSTİKAMET","yakinDurakAdi":"DURAK ADI","hatkodu":"${hatKodu}"},
+  {"kapino":"34 YY 5678","yon":"İSTİKAMET","yakinDurakAdi":"DURAK ADI","hatkodu":"${hatKodu}"}
+]`);
+}
+
+async function simulateDurakSaatleri(durakKodu, hatKodu) {
+  return claudeSimulate(`"${hatKodu}" hattı, "${durakKodu}" durağı için tahmini varış süreleri.
+3-4 otobüs üret. İlk otobüs 2-6 dk, sonrakiler 8-20 dk aralığında.
+
+JSON formatı (başka hiçbir şey yazma):
+[
+  {"kapino":"34 XX 1234","gelis_dakika":"4","hatkodu":"${hatKodu}","yon":"İSTİKAMET"},
+  {"kapino":"34 YY 5678","gelis_dakika":"11","hatkodu":"${hatKodu}","yon":"İSTİKAMET"}
+]`);
+}
+
+// ── API Fonksiyonları (Gerçek → Simüle fallback) ─────────────────────────────
 async function fetchHatBilgisi(hatKodu) {
   try {
-    const data = await iettFetch(
-      `/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHat_json?HatKodu=${encodeURIComponent(hatKodu)}`
-    );
-    return Array.isArray(data) ? (data[0] || null) : null;
-  } catch(e) {
-    console.error('fetchHatBilgisi error:', e);
-    return null;
-  }
+    const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHat_json?HatKodu=${encodeURIComponent(hatKodu)}`);
+    return Array.isArray(d) ? d[0] : null;
+  } catch { return null; }
 }
 
 async function fetchHatDuraklar(hatKodu) {
-  const data = await iettFetch(
-    `/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHatDurakList_json?HatKodu=${encodeURIComponent(hatKodu)}`
-  );
-  return Array.isArray(data) ? data : null;
+  try {
+    const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHatDurakList_json?HatKodu=${encodeURIComponent(hatKodu)}`);
+    if (Array.isArray(d) && d.length > 0) return d;
+    throw new Error('empty');
+  } catch {
+    // Gerçek API başarısız → Claude simülasyon
+    isSimulated = true;
+    return simulateHatDuraklar(hatKodu);
+  }
 }
 
 async function fetchHatOtobusler(hatKodu) {
+  if (isSimulated) return simulateOtobusler(hatKodu);
   try {
-    const data = await iettFetch(
-      `/FiloDurum/SeferGerceklesme.asmx/GetHatOtoKonum_json?HatKodu=${encodeURIComponent(hatKodu)}`
-    );
-    return Array.isArray(data) ? data : null;
-  } catch(e) {
-    console.error('fetchHatOtobusler error:', e);
-    return null;
-  }
+    const d = await iettFetch(`/FiloDurum/SeferGerceklesme.asmx/GetHatOtoKonum_json?HatKodu=${encodeURIComponent(hatKodu)}`);
+    return Array.isArray(d) ? d : null;
+  } catch { return simulateOtobusler(hatKodu); }
 }
 
 async function fetchDurakSaatleri(durakKodu, hatKodu) {
+  if (isSimulated) return simulateDurakSaatleri(durakKodu, hatKodu);
   try {
-    const data = await iettFetch(
-      `/UlasimAnaVeri/HatDurakGuzergah.asmx/GetDurakHatSaati_json?DurakKodu=${encodeURIComponent(durakKodu)}&HatKodu=${encodeURIComponent(hatKodu)}`
-    );
-    return Array.isArray(data) ? data : [];
-  } catch(e) {
-    console.error('fetchDurakSaatleri error:', e);
-    return [];
-  }
+    const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetDurakHatSaati_json?DurakKodu=${encodeURIComponent(durakKodu)}&HatKodu=${encodeURIComponent(hatKodu)}`);
+    return Array.isArray(d) ? d : [];
+  } catch { return simulateDurakSaatleri(durakKodu, hatKodu); }
 }
 
 // ── UI Helpers ───────────────────────────────────────────────────────────────
@@ -946,11 +991,24 @@ function updateCountdownDisplay() {
   if (el) el.textContent = `${refreshCountdown}s`;
 }
 
+function setSimBanner(show) {
+  const bar = document.getElementById('statusBar');
+  if (!bar) return;
+  bar.style.background = show ? 'rgba(250,204,21,0.07)' : 'rgba(34,197,94,0.07)';
+  bar.style.borderColor = show ? 'rgba(250,204,21,0.25)' : 'rgba(34,197,94,0.2)';
+  bar.style.color = show ? 'var(--yellow)' : 'var(--green)';
+  const dot = bar.querySelector('.status-dot');
+  if (dot) dot.style.background = show ? 'var(--yellow)' : 'var(--green)';
+  const badge = document.getElementById('simBadge');
+  if (badge) badge.style.display = show ? 'inline' : 'none';
+}
+
 async function searchLine() {
   const val = document.getElementById('lineInput').value.trim().toUpperCase();
   if (!val) { showNotif('Lütfen hat numarası girin'); return; }
 
   currentLine = val;
+  isSimulated = false;
   showSkeleton();
   document.getElementById('statusBar').style.display = 'flex';
   document.getElementById('statusText').textContent = `${val} hattı aranıyor...`;
@@ -959,23 +1017,22 @@ async function searchLine() {
   clearInterval(countdownInterval);
 
   try {
-    document.getElementById('statusText').textContent = 'İETT API\'ye bağlanıyor...';
+    document.getElementById('statusText').textContent = 'IBB API deneniyor...';
     const [hatBilgisi, duraklar] = await Promise.all([
       fetchHatBilgisi(val),
       fetchHatDuraklar(val)
     ]);
 
     if (!duraklar || duraklar.length === 0) {
-      showError(`"${val}" hattı bulunamadı veya aktif değil.`);
+      showError(`"${val}" hattı için veri alınamadı.`);
       return;
     }
 
     addToRecent(val);
+    setSimBanner(isSimulated);
 
     const sortedStops = [...duraklar].sort((a, b) => {
-      const ai = parseInt(a.SIRANO || a.sirano || 0);
-      const bi = parseInt(b.SIRANO || b.sirano || 0);
-      return ai - bi;
+      return parseInt(a.SIRANO||a.sirano||0) - parseInt(b.SIRANO||b.sirano||0);
     });
 
     const hatAdi = hatBilgisi
@@ -1008,7 +1065,7 @@ async function searchLine() {
     await loadBuses();
 
   } catch(err) {
-    showError('API bağlantı hatası: ' + err.message);
+    showError('Veri alınamadı: ' + err.message);
   }
 }
 
@@ -1017,7 +1074,8 @@ async function loadBuses() {
   currentStopIdx = parseInt(stopSelect.value);
   currentStopCode = currentLineData.stops[currentStopIdx].kod;
 
-  document.getElementById('statusText').textContent = 'Otobüs verileri alınıyor...';
+  const modeText = isSimulated ? 'AI simülasyonu çalıştırılıyor...' : 'Otobüs verileri alınıyor...';
+  document.getElementById('statusText').textContent = modeText;
   showSkeleton();
   clearInterval(refreshInterval);
   clearInterval(countdownInterval);
@@ -1038,12 +1096,13 @@ async function loadBuses() {
     }
 
     renderAll();
+    const modeSuffix = isSimulated ? ' · AI Simülasyon' : ' · Canlı';
     document.getElementById('statusText').textContent =
-      `${currentLineData.stops[currentStopIdx].adi} · ${new Date().toLocaleTimeString('tr-TR')} · Canlı`;
+      `${currentLineData.stops[currentStopIdx].adi} · ${new Date().toLocaleTimeString('tr-TR')}${modeSuffix}`;
+    setSimBanner(isSimulated);
 
     startCountdown();
 
-    // 30 saniyede bir otomatik yenile
     refreshInterval = setInterval(async () => {
       try {
         const [ob, ds] = await Promise.all([
@@ -1053,8 +1112,9 @@ async function loadBuses() {
         buses = buildBusData(ob, ds);
         renderBusList();
         updateStats();
+        const sfx = isSimulated ? ' · AI Simülasyon' : ' · Canlı';
         document.getElementById('statusText').textContent =
-          `${currentLineData.stops[currentStopIdx].adi} · ${new Date().toLocaleTimeString('tr-TR')} · Canlı`;
+          `${currentLineData.stops[currentStopIdx].adi} · ${new Date().toLocaleTimeString('tr-TR')}${sfx}`;
         startCountdown();
       } catch(_) {}
     }, 30000);
@@ -1158,8 +1218,14 @@ function showError(msg) {
       <div class="empty-icon">⚠️</div>
       <p style="color:var(--iett-red)">${msg}</p>
       <p style="margin-top:8px;font-size:10px">Hat kodu doğru mu? Örn: 34T, 500T, 15B, 28</p>
+      <p style="margin-top:6px;font-size:10px;color:var(--muted);line-height:1.7">
+        Claude AI simülasyonu da başarısız oldu.<br>
+        Bu uygulamayı <strong style="color:var(--accent)">GitHub Pages</strong>'e yüklerseniz<br>
+        gerçek İETT verisi çalışır.
+      </p>
     </div>`;
   document.getElementById('statusText').textContent = 'Hata oluştu';
+  setSimBanner(false);
 }
 
 function showEmpty(msg) {
