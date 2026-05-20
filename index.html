@@ -772,13 +772,13 @@
 
 const IETT_BASE = "https://api.ibb.gov.tr/iett";
 
-// CORS proxy sırası (5 farklı servis)
+// CORS proxy sırası - güncel servisler
 const CORS_PROXIES = [
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
   url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://thingproxy.freeboard.io/fetch/${url}`,
   url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-  url => `https://proxy.cors.sh/${url}`,
-  url => `https://cors.eu.org/${url}`,
+  url => `https://cors-anywhere.herokuapp.com/${url}`,
 ];
 
 // ── State ───────────────────────────────────────────────────────────────────
@@ -845,7 +845,11 @@ function parseIETTJSON(text) {
 async function claudeSimulate(prompt) {
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
       max_tokens: 1200,
@@ -899,12 +903,26 @@ JSON formatı (başka hiçbir şey yazma):
 // ── API Fonksiyonları (Gerçek → Simüle fallback) ─────────────────────────────
 async function fetchHatBilgisi(hatKodu) {
   try {
+    // HatDurakGuzergah servisi - GetHat_json
     const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHat_json?HatKodu=${encodeURIComponent(hatKodu)}`);
-    return Array.isArray(d) ? d[0] : null;
+    return Array.isArray(d) ? d[0] : (d || null);
   } catch { return null; }
 }
 
 async function fetchHatDuraklar(hatKodu) {
+  // Deneme sırası: REST JSON → SOAP XML → Claude AI simülasyon
+  const endpoints = [
+    `/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHatDurakList_json?HatKodu=${encodeURIComponent(hatKodu)}`,
+    `/UlasimAnaVeri/HatDurakGuzergah.asmx/GetDurak_json?DurakKodu=`,
+  ];
+  for (const ep of endpoints) {
+    try {
+      const d = await iettFetch(ep.startsWith('/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHatDurakList') ? ep : null);
+      if (d) {
+        if (Array.isArray(d) && d.length > 0) return d;
+      }
+    } catch {}
+  }
   try {
     const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetHatDurakList_json?HatKodu=${encodeURIComponent(hatKodu)}`);
     if (Array.isArray(d) && d.length > 0) return d;
@@ -919,6 +937,7 @@ async function fetchHatDuraklar(hatKodu) {
 async function fetchHatOtobusler(hatKodu) {
   if (isSimulated) return simulateOtobusler(hatKodu);
   try {
+    // SeferGerceklesme servisi - GetHatOtoKonum_json (onur2677/iett-api: SeferGerceklesme)
     const d = await iettFetch(`/FiloDurum/SeferGerceklesme.asmx/GetHatOtoKonum_json?HatKodu=${encodeURIComponent(hatKodu)}`);
     return Array.isArray(d) ? d : null;
   } catch { return simulateOtobusler(hatKodu); }
@@ -927,6 +946,12 @@ async function fetchHatOtobusler(hatKodu) {
 async function fetchDurakSaatleri(durakKodu, hatKodu) {
   if (isSimulated) return simulateDurakSaatleri(durakKodu, hatKodu);
   try {
+    // Önce PlanlananSeferSaati servisini dene (onur2677/iett-api: PlanlananSeferSaati)
+    const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetPlanlananSeferSaati_json?HatKodu=${encodeURIComponent(hatKodu)}`);
+    if (Array.isArray(d) && d.length > 0) return d;
+  } catch {}
+  try {
+    // Fallback: DurakHatSaati
     const d = await iettFetch(`/UlasimAnaVeri/HatDurakGuzergah.asmx/GetDurakHatSaati_json?DurakKodu=${encodeURIComponent(durakKodu)}&HatKodu=${encodeURIComponent(hatKodu)}`);
     return Array.isArray(d) ? d : [];
   } catch { return simulateDurakSaatleri(durakKodu, hatKodu); }
